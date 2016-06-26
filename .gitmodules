@@ -1,0 +1,6 @@
+[submodule "snippets"]
+	path = snippets
+	url = git@github.com:drewbarbs/yasnippet-snippets.git
+[submodule "other-snippets/org-mode"]
+	path = other-snippets/org-mode
+	url = git@github.com:drewbarbs/yasnippet-org-mode.git

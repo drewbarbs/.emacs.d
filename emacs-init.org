@@ -1,0 +1,254 @@
+#+TITLE: Emacs Configuration
+#+AUTHOR: Drew Barbarello
+
+* About
+My emacs configuration inspired by [[http://endlessparentheses.com/init-org-Without-org-mode.html][this]] and [[http://pages.sachachua.com/.emacs.d/Sacha.html][this]].
+
+* Personal
+#+begin_src emacs-lisp
+(setq user-full-name "Andrew Barbarello"
+      user-email-address "andrew.barbarello@outlook.com")
+#+end_src
+
+* Initialization
+
+** Package archives
+#+begin_src emacs-lisp
+(require 'package)
+(setq my/package-archives '(("melpa" . "https://melpa.org/packages/")
+                            ("org" . "http://orgmode.org/elpa/")))
+(mapc (lambda (archive)
+        (let ((id (car archive))
+              (location (cdr archive)))
+          (unless (assoc-default id package-archives)
+            (add-to-list 'package-archives archive t)))) my/package-archives)
+;; setup load path
+(package-initialize)
+(setq package-enable-at-startup nil)
+#+end_src
+We are manually calling =package-initialize=, so we set
+=package-enable-at-startup= to =nil= to disable the default behavior
+of =package-initialize= being run after processing of the =init.el=
+file (see [[http://emacs.stackexchange.com/a/5888][here]]).
+
+** =use-package=
+Inspired by [[http://www.lunaryorn.com/2015/01/06/my-emacs-configuration-with-use-package.html][this]] post, using =use-package= to ensure packages are
+installed and initialize them lazily.
+
+#+begin_src emacs-lisp
+;; bootstrap `use-package'
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
+#+end_src
+
+** =auto-compile=
+Package to ensure previously byte-compiled files never shadow changes
+in the corresponding source (=.el=) file.
+#+begin_src emacs-lisp
+(require 'use-package)
+(use-package auto-compile
+  :ensure t
+  :init (setq load-prefer-newer t)
+  :config (auto-compile-on-load-mode))
+#+end_src
+
+** =custom-file=
+The place where =custom-set-variables= decisions are persisted.
+#+begin_src emacs-lisp
+(setq custom-file "~/.emacs.d/custom-settings.el")
+(load custom-file t)
+#+end_src
+
+** Startup buffer
+Show =*scratch*= buffer on startup, rather than splash screen.
+#+begin_src emacs-lisp
+(setq inhibit-splash-screen t)
+(setq inhibit-startup-message t)
+#+end_src
+
+* Global
+
+** Appearance
+
+*** Leuven
+#+begin_src emacs-lisp
+(use-package leuven-theme
+  :pin melpa
+  :ensure t
+  :init (load-theme 'leuven :no-confirm))
+#+end_src
+
+*** Disable Window Chrome
+#+begin_src emacs-lisp
+(menu-bar-mode -1)
+(tool-bar-mode -1)
+(scroll-bar-mode -1)
+#+end_src
+
+** Behavior
+
+*** =whitespace-mode=
+Clean whitespace on save, highlight whitespace in buffers.
+#+begin_src emacs-lisp
+(defun my/enable-whitespace ()
+  "Enable `whitespace-mode' and invoke `whitespace-cleanup' on file save."
+  (add-hook 'before-save-hook #'whitespace-cleanup nil t)
+  (whitespace-mode +1))
+
+(use-package whitespace
+  :ensure t
+  :config
+  (setq whitespace-line-column 80)
+  (setq whitespace-style '(face tabs empty trailing lines-tail))
+  (add-hook 'text-mode-hook #'my/enable-whitespace))
+#+end_src
+
+*** Change "yes or no" to "y or n"
+Type out the full strings "yes" and "no"? Ain't nobody got time for that.
+#+begin_src emacs-lisp
+(fset 'yes-or-no-p 'y-or-n-p)
+#+end_src
+
+*** Undo tree
+=C-x u= on steroids: browse history of edits (undo and redo).
+#+begin_src emacs-lisp
+(use-package undo-tree
+  :diminish undo-tree-mode
+  :ensure t
+  :config
+  (global-undo-tree-mode))
+#+end_src
+
+** Snippets
+#+begin_src emacs-lisp
+(use-package yasnippet
+  :diminish yas-minor-mode
+  :ensure t
+  :init
+  (setq yas-snippet-dirs
+        '("~/.emacs.d/other-snippets"
+          "~/.emacs.d/snippets"))
+  (yas-global-mode 1)
+  (yas-reload-all))
+#+end_src
+
+** =magit-mode=
+#+begin_src emacs-lisp
+(use-package magit
+  :ensure t
+  :bind ("C-x g" . magit-status))
+#+end_src
+
+* Org Mode
+
+** Settings
+
+*** Source block indentation
+Disable Org's default behavior of indenting code from a source block
+with spaces after saving back to buffer from =org-edit-src-code= (C-c ')
+#+begin_src emacs-lisp
+(setq org-edit-src-content-indentation 0)
+(setq org-edit-src-preserve-indentation nil)
+#+end_src
+
+*** Whitespace mode
+Fix whitespace mode's naive =lines-tail= highlighting, so that only
+the /description text/ of org mode links counts against the
+=whitespace-line-column= limit.
+
+#+begin_src emacs-lisp
+;; "inspired by" example at https://www.emacswiki.org/emacs/HighlightLongLines
+;; a font-lock-keyword for org-mode. highlights parts of lines that extend past
+;; whitespace-line-column, assuming that only the *description* of org links are
+;; visible (and hence, only the descriptions count against the line length limit)
+
+(defun my/advance-to-col (startpos startcol stopcol)
+  "Given a start position STARTPOS in the current buffer, the column count
+at point STARTPOS (STARTCOL) and desired end column (STOPCOL), return the
+position of character starting column (STOPCOL+1)"
+  (let ((curpos startpos)
+        (curcols startcol))
+    (while (< curcols stopcol)
+      (setq curcols (+ curcols (char-width (char-after curpos))))
+      (setq curpos (1+ curpos)))
+    curpos))
+
+(defun my/next-long-org-line (limit)
+  "Return the next tuple (start end) of positions from current value of (point) to
+be marked as entending past line length LIMIT."
+  (catch 'done
+    (while (< (line-beginning-position) limit)
+      (beginning-of-line)
+      (let ((curcols 0)
+            (lim (min limit (line-end-position)))
+            (curpos (point)))
+        (while (re-search-forward org-bracket-link-analytic-regexp lim t)
+          (let ((mstartcol (+ curcols
+                              (string-width (buffer-substring
+                                             (match-beginning 0) curpos))))
+                labelwidth
+                labelstart)
+            (if (match-string 5)
+                ;; link of the form [[proto:link][description]]
+                (setq labelwidth (string-width (match-string 5))
+                      labelstart (match-beginning 5))
+              ;; link of the form [[proto:something]]
+              (setq labelwidth (string-width (concat (match-string 1) (match-string 3)))
+                    labelstart (match-beginning 1)))
+            (when (>= mstartcol whitespace-line-column)
+              ;; link starts after whitespace-line-column, wholesale mark everything
+              ;; after whitespace-line-column
+              (throw 'done (list (my/advance-to-col curpos curcols whitespace-line-column) lim)))
+            (when (>= (+ mstartcol labelwidth) whitespace-line-column)
+              ;; link starts before whitespace-line-column, but description (visible part)
+              ;; extends past it
+              (throw 'done (list (my/advance-to-col labelstart mstartcol whitespace-line-column) lim)))
+            (setq curcols (+ mstartcol labelwidth)))
+          (setq curpos (point)))
+        ;; no org link match, see if line is just a long one
+        (let ((advancecols (string-width (buffer-substring (point) (line-end-position)))))
+          (when (>= (+ curcols advancecols) whitespace-line-column)
+            (throw 'done (list (my/advance-to-col curpos curcols whitespace-line-column) lim)))))
+      (if (< (1+ (line-end-position)) (point-max))
+          (forward-line)
+        (throw 'done nil)))))
+
+(defun my/match-long-org (limit)
+  (let ((match-range (my/next-long-org-line limit)))
+    (when match-range
+      (set-match-data match-range)
+      (goto-char (1+ (cadr match-range))))
+    ;; if we didn't find a match, match-range is nil, and this matcher is done
+    match-range))
+
+(setq my/org-bline-minor-mode-font-lock-keywords
+      '((my/match-long-org 0 whitespace-line prepend)))
+
+(define-minor-mode my/org-bline-minor-mode "Overlong lines can make you blined."
+  nil nil nil
+  (if my/org-bline-minor-mode
+      (font-lock-add-keywords nil my/org-bline-minor-mode-font-lock-keywords t)
+    (font-lock-remove-keywords nil my/org-bline-minor-mode-font-lock-keywords))
+  (font-lock-mode 1))
+
+(defun my/org-bline-minor-mode--insin ()
+  (add-hook 'after-change-functions 'my/org-bline-minor-mode--uate nil t)
+  ;; for debugging purposes, disable the JIT
+  ;; (setq font-lock-support-mode nil)
+  ;; (font-lock-mode -1)
+  ;; (font-lock-mode 1)
+
+  ;; get rid of the long line highlighting from whitespace-mode, we're doing
+  ;; our own highlighting
+  (whitespace-mode 0)
+  (set (make-local-variable 'whitespace-style)
+       (remove 'lines-tail whitespace-style))
+  (whitespace-mode +1))
+
+(defun my/org-bline-minor-mode--uate (&rest ignore)
+  (my/org-bline-minor-mode 1)
+  (remove-hook 'after-change-functions 'my/org-bline-minor-mode--uate t))
+
+(add-hook 'org-mode-hook 'my/org-bline-minor-mode--insin))
+#+end_src
