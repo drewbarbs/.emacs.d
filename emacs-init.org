@@ -80,6 +80,111 @@ Show =*scratch*= buffer on startup, rather than splash screen.
 
 * Global
 
+** Editing
+Universal editing configuration: how to handle whitespace, etc.
+Largely lifted from =prelude-editor.el=.
+*** Whitespace
+#+begin_src emacs-lisp
+;; Death to the tabs!  However, tabs historically indent to the next
+;; 8-character offset; specifying anything else will cause *mass*
+;; confusion, as it will change the appearance of every existing file.
+;; In some cases (python), even worse -- it will change the semantics
+;; (meaning) of the program.
+;;
+;; Emacs modes typically provide a standard means to change the
+;; indentation width -- eg. c-basic-offset: use that to adjust your
+;; personal indentation width, while maintaining the style (and
+;; meaning) of any files you load.
+(setq-default indent-tabs-mode nil)   ;; don't use tabs to indent
+(setq-default tab-width 8)            ;; but maintain correct appearance
+
+;; Newline at end of file
+(setq require-final-newline t)
+#+end_src
+
+**** =whitespace-mode=
+Clean whitespace on save, highlight whitespace in buffers.
+#+begin_src emacs-lisp
+(defun my/enable-whitespace ()
+  "Enable `whitespace-mode' and invoke `whitespace-cleanup' on file save."
+  (add-hook 'before-save-hook #'whitespace-cleanup nil t)
+  (whitespace-mode +1))
+
+(use-package whitespace
+  :diminish whitespace-mode
+  :config
+  (setq whitespace-line-column 80)
+  (setq whitespace-style '(face tabs empty trailing lines-tail))
+  (add-hook 'text-mode-hook #'my/enable-whitespace)
+  (add-hook 'prog-mode-hook #'my/enable-whitespace))
+#+end_src
+
+*** Typing replaces selection
+Another bit of config from Prelude that I didn't realize I needed
+until I ran Emacs without it. With this setting, typing replaces an
+active selection, whereas the default behavior is that text is just
+inserted at point regardless of the selection.
+
+#+begin_src emacs-lisp
+(delete-selection-mode t)
+#+end_src
+
+*** =auto-fill-mode=
+For programming modes, define the function =comment-auto-fill= to
+disable auto-fill except for on comments. Taken from [[https://www.emacswiki.org/emacs/AutoFillMode][here]].
+
+#+begin_src emacs-lisp
+(add-hook 'text-mode-hook #'turn-on-auto-fill)
+(defun comment-auto-fill ()
+  (setq-local comment-auto-fill-only-comments t)
+  (auto-fill-mode 1))
+(diminish 'auto-fill-function)
+#+end_src
+
+
+*** Expand at point
+
+**** =hippie-expand=
+Setup =hippie-expand=, which completes the word before point using one
+of a variety of sources. Another bit of config taken verbatim from
+Prelude
+
+#+begin_src emacs-lisp
+;; hippie expand is dabbrev expand on steroids
+(setq hippie-expand-try-functions-list '(try-expand-dabbrev
+                                         try-expand-dabbrev-all-buffers
+                                         try-expand-dabbrev-from-kill
+                                         try-complete-file-name-partially
+                                         try-complete-file-name
+                                         try-expand-all-abbrevs
+                                         try-expand-list
+                                         try-expand-line
+                                         try-complete-lisp-symbol-partially
+                                         try-complete-lisp-symbol))
+(global-set-key (kbd "M-/") 'hippie-expand)
+#+end_src
+
+**** =abbrev=
+Enable =abbrev= for =text-mode= buffers
+#+begin_src emacs-lisp
+(setq abbrev-file-name (expand-file-name "abbrev_defs" init-dir))
+(add-hook 'text-mode-hook (lambda () (abbrev-mode 1)))
+(diminish 'abbrev-mode)
+#+end_src
+
+
+*** General indentation/formatting
+Setup indentation/formatting bindings that apply in (nearly) any major
+mode.
+
+First, setup =<TAB>= to first indent the current line, then if the
+line is already indented, complete the thing at point.
+#+begin_src emacs-lisp
+(setq tab-always-indent 'complete)
+#+end_src
+
+The next bit of code from Prelude makes
+
 ** Appearance
 
 *** Leuven
@@ -97,34 +202,22 @@ Show =*scratch*= buffer on startup, rather than splash screen.
 (scroll-bar-mode -1)
 #+end_src
 
-** Behavior
-
-*** =auto-fill-mode=
-For programming modes, define the function =comment-auto-fill= to
-disable auto-fill except for on comments. Taken from [[https://www.emacswiki.org/emacs/AutoFillMode][here]].
-
+*** Disambiguate buffers with the same name
 #+begin_src emacs-lisp
-(add-hook 'text-mode-hook #'turn-on-auto-fill)
-(defun comment-auto-fill ()
-  (setq-local comment-auto-fill-only-comments t)
-  (auto-fill-mode 1))
+(use-package uniquify
+  :config
+  (setq uniquify-buffer-name-style 'forward)
+  (setq uniquify-separator "/")
+  (setq uniquify-after-kill-buffer-p t)     ; rename after killing uniquified
+  (setq uniquify-ignore-buffers-re "^\\*")) ; don't muck with special buffers
 #+end_src
 
-
-*** =whitespace-mode=
-Clean whitespace on save, highlight whitespace in buffers.
+** Behavior
+*** Auto refresh buffer when associated file changes
+#+srcname: name
 #+begin_src emacs-lisp
-(defun my/enable-whitespace ()
-  "Enable `whitespace-mode' and invoke `whitespace-cleanup' on file save."
-  (add-hook 'before-save-hook #'whitespace-cleanup nil t)
-  (whitespace-mode +1))
-
-(use-package whitespace
-  :config
-  (setq whitespace-line-column 80)
-  (setq whitespace-style '(face tabs empty trailing lines-tail))
-  (add-hook 'text-mode-hook #'my/enable-whitespace)
-  (add-hook 'prog-mode-hook #'my/enable-whitespace))
+(global-auto-revert-mode 1)
+(diminish 'auto-revert-mode)
 #+end_src
 
 *** Change "yes or no" to "y or n"
@@ -140,6 +233,10 @@ Type out the full strings "yes" and "no"? Ain't nobody got time for that.
   :diminish undo-tree-mode
   :ensure t
   :config
+  ;; autosave the undo-tree history
+  (setq undo-tree-history-directory-alist
+        `((".*" . ,temporary-file-directory)))
+  (setq undo-tree-auto-save-history t)
   (global-undo-tree-mode))
 #+end_src
 
@@ -151,10 +248,46 @@ expected.
 (setq sentence-end-double-space nil)
 #+end_src
 
+*** Prefer vertical splits
+From [[http://stackoverflow.com/a/25587333/756104][this]] stack overflow answer, opens a new window with a vertical
+split if there's sufficient room available, otherwise uses a
+horizontal split.
+#+begin_src emacs-lisp
+(setq split-height-threshold nil)
+(setq split-width-threshold 200)
+#+end_src
+
+*** Transpose Windows
+Bind =C-c y= to transpose windows (a vertical split becomes a
+horizontal one and vice versa). =C-c f= will swap buffers across $y$
+axis, =C-c F= will swap buffers across $x$ axis.
+#+begin_src emacs-lisp
+(use-package transpose-frame
+  :ensure t
+  :bind (("C-c y" . transpose-frame)
+         ("C-c f" . flop-frame)
+         ("C-c F" . flip-frame)))
+#+end_src
+
+
 *** Backups/Persistence
+Pretty much all this stuff is copied verbatim from Prelude. It gets
+the =backup~= files out of the way, remembers where you last left in a
+file, remembers minibuffer history, etc.
+
 #+begin_src emacs-lisp
 (defvar my/savefile-dir (expand-file-name "savefile" init-dir)
   "This folder stores all the automatically generated save/history-files.")
+#+end_src
+
+Store all backup files in temp directory, so as to not pollute the
+project directory.
+#+begin_src emacs-lisp
+;; store all backup and autosave files in the tmp dir
+(setq backup-directory-alist
+      `((".*" . ,temporary-file-directory)))
+(setq auto-save-file-name-transforms
+      `((".*" ,temporary-file-directory t)))
 #+end_src
 
 
@@ -181,6 +314,32 @@ I use =recentf-open-files= all the time.
   (recentf-mode +1))
 #+end_src
 
+**** Save place in file
+#+begin_src emacs-lisp
+(use-package saveplace
+  :ensure t
+  :config
+  (setq save-place-file (expand-file-name "saveplace" my/savefile-dir))
+  ;; activate save-place for all buffers
+  (setq-default save-place t))
+#+end_src
+
+
+**** Save minibuffer history
+From Prelude, configure =savehist= to store the last few commands run
+in the minibuffer, which persists across runs of emacs.
+#+begin_src emacs-lisp
+(use-package savehist
+  :ensure t
+  :config
+  (setq savehist-additional-variables
+        ;; search entries
+        '(search-ring regexp-search-ring)
+        ;; save every minute
+        savehist-autosave-interval 60
+        savehist-file (expand-file-name "savehist" my/savefile-dir))
+  (savehist-mode +1))
+#+end_src
 
 ** Snippets
 Fetch yasnippet, add the =other-snippets= directory to the path (where
@@ -192,16 +351,29 @@ I pull in additional snippets via git submodules).
   :init
   (setq yas-snippet-dirs
         `(,(expand-file-name "other-snippets" init-dir)
-          ,(expand-file-name "snippets" init-dir))
+          ,(expand-file-name "snippets" init-dir)))
   (yas-global-mode 1)
   (yas-reload-all))
 #+end_src
 
-** =magit-mode=
+** Git
+
+*** =magit-mode=
 #+begin_src emacs-lisp
 (use-package magit
   :ensure t
   :bind ("C-x g" . magit-status))
+#+end_src
+
+*** Highlight uncommitted changes
+#+begin_src emacs-lisp
+(use-package diff-hl
+  :ensure t
+  :pin melpa
+  :config
+  (global-diff-hl-mode +1)
+  (add-hook 'dired-mode-hook 'diff-hl-dired-mode)
+  (add-hook 'magit-post-refresh-hook #'diff-hl-magit-post-refresh))
 #+end_src
 
 ** =flyspell-mode=
@@ -214,7 +386,7 @@ Flyspell config, appropriate from Prelude.
 
 (use-package flyspell
   :ensure t
-  :diminish
+  :diminish flyspell-mode
   :config
   (setq ispell-program-name "aspell" ; use aspell instead of ispell
         ispell-extra-args '("--sug-mode=ultra"))
