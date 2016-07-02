@@ -278,6 +278,9 @@ file, remembers minibuffer history, etc.
 #+begin_src emacs-lisp
 (defvar my/savefile-dir (expand-file-name "savefile" init-dir)
   "This folder stores all the automatically generated save/history-files.")
+
+(unless (file-exists-p my/savefile-dir)
+  (make-directory my/savefile-dir))
 #+end_src
 
 Store all backup files in temp directory, so as to not pollute the
