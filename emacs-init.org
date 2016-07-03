@@ -353,6 +353,20 @@ Type out the full strings "yes" and "no"? Ain't nobody got time for that.
   (global-undo-tree-mode))
 #+end_src
 
+*** =anzu=
+Use =anzu= to improve isearch/query-replace by highlighting
+matches/showing a preview of the replacement as you type
+
+#+begin_src emacs-lisp
+(use-package anzu
+  :ensure t
+  :diminish anzu-mode
+  :bind (("M-%" . anzu-query-replace)
+         ("C-M-%" . anzu-query-replace-regexp))
+  :config
+  (global-anzu-mode))
+#+end_src
+
 *** Sentences end with a single space
 Saw this in Sacha Chua's [[http://pages.sachachua.com/.emacs.d/Sacha.html][config]], and adopting it here. Allows
 =forward-sentence= (=M-e=) and =backward-sentence= (=M-a=) to work as
