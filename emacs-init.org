@@ -282,6 +282,21 @@ act on the whole buffer if called without an active region.
 (scroll-bar-mode -1)
 #+end_src
 
+*** =smart-mode-line=
+Enable =smart-mode-line=, with the powerline theme
+
+#+begin_src emacs-lisp
+(setq column-number-mode t)
+
+(use-package smart-mode-line
+  :ensure t
+  :config
+  (setq sml/no-confirm-load-theme t)
+  ;; delegate theming to the currently active theme
+  (setq sml/theme nil)
+  (sml/setup))
+#+end_src
+
 *** Disambiguate buffers with the same name
 #+begin_src emacs-lisp
 (use-package uniquify
