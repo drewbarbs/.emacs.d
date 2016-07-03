@@ -276,6 +276,24 @@ The next bit of code from Prelude makes
   (setq uniquify-ignore-buffers-re "^\\*")) ; don't muck with special buffers
 #+end_src
 
+*** Make =point= easier to find
+Highlight the current line using =hl-line-mode=
+
+#+begin_src emacs-lisp
+(use-package hl-line
+  :ensure t
+  :config (global-hl-line-mode +1))
+#+end_src
+
+Animate the current line when making point jump/activating point in
+another window
+#+begin_src emacs-lisp
+;; show the cursor when moving after big movements in the window
+(use-package beacon
+  :ensure t
+  :config (beacon-mode +1))
+#+end_src
+
 ** Behavior
 *** Auto refresh buffer when associated file changes
 #+srcname: name
