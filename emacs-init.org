@@ -119,6 +119,52 @@ Clean whitespace on save, highlight whitespace in buffers.
   (add-hook 'prog-mode-hook #'my/enable-whitespace))
 #+end_src
 
+*** Matching pairs (=smartparens-mode= and more)
+
+The following block defines some keymappings for wrapping the active
+region with a character (taken from prelude), it requires =smartparens-mode=.
+
+#+begin_src emacs-lisp
+(defun prelude-wrap-with (s)
+  "Create a wrapper function for smartparens using S."
+  `(lambda (&optional arg)
+     (interactive "P")
+     (sp-wrap-with-pair ,s)))
+
+(defun partial-map-add (key fun)
+  "Given a keymapping KEY -> FUN, return a function that takes a
+keymap and adds the given mapping"
+  `(lambda (keymap)
+     (define-key keymap ,key ,fun)))
+
+(setq my/wrap-mappings
+      (mapcar (lambda (pair) (partial-map-add (car pair) (cdr pair)))
+        '(((kbd "M-\"") . (prelude-wrap-with "\""))
+          ((kbd "M-(") . (prelude-wrap-with "("))
+          ((kbd "M-[") . (prelude-wrap-with "[")))))
+
+(defun my/add-wrap-mappings (map)
+  (mapc (lambda (mapping) (funcall mapping map)) my/wrap-mappings))
+
+(my/add-wrap-mappings prog-mode-map)
+(add-hook 'c-initialization-hook
+          (lambda () (my/add-wrap-mappings c-mode-base-map)))
+#+end_src
+
+Here, we setup =smartparens= to show matching pairs and install its
+=paredit=-style bindings.
+
+#+begin_src emacs-lisp
+(use-package smartparens-config
+  :ensure smartparens
+  :config
+  (setq sp-base-key-bindings 'paredit)
+  (setq sp-autoskip-closing-pair 'always)
+  (setq sp-hybrid-kill-entire-symbol nil)
+  (sp-use-paredit-bindings)
+  (show-smartparens-global-mode +1))
+#+end_src
+
 *** Typing replaces selection
 Another bit of config from Prelude that I didn't realize I needed
 until I ran Emacs without it. With this setting, typing replaces an
