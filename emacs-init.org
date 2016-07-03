@@ -396,6 +396,11 @@ axis, =C-c F= will swap buffers across $x$ axis.
          ("C-c F" . flip-frame)))
 #+end_src
 
+*** Use =ibuffer=
+#+begin_src emacs-lisp
+;; replace buffer-menu with ibuffer
+(global-set-key (kbd "C-x C-b") 'ibuffer)
+#+end_src
 
 *** Backups/Persistence
 Pretty much all this stuff is copied verbatim from Prelude. It gets
@@ -671,8 +676,8 @@ in HTML export
 (setq org-src-fontify-natively t)
 ;; From http://emacs.stackexchange.com/q/3374
 (defun my/org-inline-css-hook (exporter)
-  "Insert custom inline css to automatically set the
-background of code to whatever theme I'm using's background"
+  "Insert custom inline css to set the
+background of code blocks to that of whatever theme I'm using"
   (when (eq exporter 'html)
     (let* ((my-pre-bg (face-background 'default))
            (my-pre-fg (face-foreground 'default)))
