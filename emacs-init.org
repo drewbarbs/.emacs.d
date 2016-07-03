@@ -425,6 +425,26 @@ project directory.
       `((".*" ,temporary-file-directory t)))
 #+end_src
 
+** Navigation
+*** Jump to char with =avy=
+Use =avy=, based on =ace-jump-mode= and =vim-easymotion=.
+
+- Jump to a character using =C-:=
+- Jump to a character (after entering two characters) using =C=' (does
+  not work in org mode, because this is instead bound to org-cycle-agenda-files
+- Jump to a line with =M-g f=
+- Jump to a word with =M-g w= (like =avy-goto-char=, but only matches
+  that character at the beginning of a word.
+
+#+begin_src emacs-lisp
+(use-package avy
+  :ensure t
+  :bind (("C-:" . avy-goto-char)
+         ("C-'" . avy-goto-char-2)
+         ("M-g f" . avy-goto-line)
+         ("M-g w" . avy-goto-word-1)))
+#+end_src
+
 
 **** =recentf-mode=
 I use =recentf-open-files= all the time.
