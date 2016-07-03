@@ -187,7 +187,6 @@ disable auto-fill except for on comments. Taken from [[https://www.emacswiki.org
 (diminish 'auto-fill-function)
 #+end_src
 
-
 *** Expand at point
 
 **** =hippie-expand=
@@ -211,13 +210,32 @@ Prelude
 #+end_src
 
 **** =abbrev=
-Enable =abbrev= for =text-mode= buffers
+Enable =abbrev= for =text-mode= buffers.
+
 #+begin_src emacs-lisp
 (setq abbrev-file-name (expand-file-name "abbrev_defs" init-dir))
 (add-hook 'text-mode-hook (lambda () (abbrev-mode 1)))
 (diminish 'abbrev-mode)
 #+end_src
 
+Check out the manual for =abbrev-mode= [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Abbrevs.html#Abbrevs][here]]. In brief, the important
+keybindings are:
+
+- =C-x a g= :: Add global abbreviation for the word before point.
+               Can call with a numeric prefix argument \(n\) to
+               specify the number of words prior to point to define
+               the abbreviation for.
+- =C-x a l= :: Define an abbreviation as above, but that only applies
+               to the current major mode.
+- =C-x a i g= :: Use word before point as an abbreviation for a phrase
+                 you define in the minibuffer.
+- =M-x kill-all-abbrevs= :: Discard all abbrev definitions.
+
+In order to type a prefix to an abbreviation (text that precedes the
+expanded abbreviation without whitespace in between): type the prefix,
+then type =M-=' followed by the abbreviation.
+
+To type an abbreviation /without/ having it expand, type =C-q <SPC>=.
 
 *** General indentation/formatting
 Setup indentation/formatting bindings that apply in (nearly) any major
