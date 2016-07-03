@@ -247,7 +247,23 @@ line is already indented, complete the thing at point.
 (setq tab-always-indent 'complete)
 #+end_src
 
-The next bit of code from Prelude makes
+The next bit of code from Prelude makes =indent-region= and =untabify=
+act on the whole buffer if called without an active region.
+
+#+begin_src emacs-lisp
+(defmacro with-region-or-buffer (func)
+  "When called with no active region, call FUNC on current buffer."
+  `(defadvice ,func (before with-region-or-buffer activate compile)
+     (interactive
+      (if mark-active
+          (list (region-beginning) (region-end))
+        (list (point-min) (point-max))))))
+
+(use-package tabify
+  :config
+  (with-region-or-buffer indent-region)
+  (with-region-or-buffer untabify))
+#+end_src
 
 ** Appearance
 
