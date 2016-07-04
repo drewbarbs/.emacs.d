@@ -122,7 +122,7 @@ Clean whitespace on save, highlight whitespace in buffers.
 *** Matching pairs (=smartparens-mode= and more)
 
 The following block defines some keymappings for wrapping the active
-region with a character (taken from prelude), it requires =smartparens-mode=.
+region with a character (taken from Prelude), it requires =smartparens-mode=.
 
 #+begin_src emacs-lisp
 (defun prelude-wrap-with (s)
@@ -426,6 +426,30 @@ project directory.
 #+end_src
 
 ** Navigation
+*** =helm=
+An all-encompassing completion package. See [[https://github.com/emacs-helm/helm/wiki#helm-interaction-model][here]] for
+philosophy/essential keybindings.
+
+To "helm" a command, use the =helm-command-prefix-key=: =C-x c=. E.g.
+=C-x c M-x= runs =helm-M-x=.
+
+#+begin_src emacs-lisp
+(use-package helm
+  :diminish helm-mode
+  :init
+  (progn
+    (use-package helm-config :ensure helm)
+    (helm-mode 1))
+  :bind (("M-x" . helm-M-x)
+         ("M-s o" . helm-occur)
+         ("C-h a" . helm-apropos)
+         ("C-x r b" . helm-filtered-bookmarks)
+         ("C-x b" . helm-buffers-list)
+         ("M-y" . helm-show-kill-ring)
+         ("C-x C-b" . helm-mini)
+         ("C-x C-f" . helm-find-files)))
+#+end_src
+
 *** Jump to char with =avy=
 Use =avy=, based on =ace-jump-mode= and =vim-easymotion=.
 
@@ -457,7 +481,7 @@ I use =recentf-open-files= all the time.
             (mapcar 'file-truename (list my/savefile-dir package-user-dir)))))
 
 (use-package recentf
-  :bind ("C-x C-r" . recentf-open-files)
+  :bind ("C-x C-r" . helm-recentf)
   :config
   (setq recentf-save-file (expand-file-name "recentf" my/savefile-dir)
         recentf-max-saved-items 500
