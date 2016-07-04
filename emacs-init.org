@@ -396,11 +396,6 @@ axis, =C-c F= will swap buffers across $x$ axis.
          ("C-c F" . flip-frame)))
 #+end_src
 
-*** Use =ibuffer=
-#+begin_src emacs-lisp
-;; replace buffer-menu with ibuffer
-(global-set-key (kbd "C-x C-b") 'ibuffer)
-#+end_src
 
 *** Backups/Persistence
 Pretty much all this stuff is copied verbatim from Prelude. It gets
@@ -740,3 +735,10 @@ background of code blocks to that of whatever theme I'm using"
 #+begin_src emacs-lisp
 (add-hook 'c-mode-common-hook #'comment-auto-fill)
 #+end_src
+* Misc
+Turn on =helm-top-poll-mode= so that =helm-top= auto-refreshes.
+
+#+begin_src emacs-lisp
+(helm-top-poll-mode 1)
+#+end_src
+
