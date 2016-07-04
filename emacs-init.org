@@ -445,6 +445,20 @@ To "helm" a command, use the =helm-command-prefix-key=: =C-x c=. E.g.
          ("C-x C-f" . helm-find-files)))
 #+end_src
 
+Add =helm-swoop=, which is like a souped-up =occur=. It moves the
+cursor in the original buffer around with the selected swoop match,
+can show a configurable number of context lines (prefix argument),
+can search across multiple buffers, etc.
+
+#+begin_src emacs-lisp
+(use-package helm-swoop
+  :ensure t
+  :bind (("M-i" . helm-swoop)
+         ("M-I" . helm-swoop-back-to-last-point)
+         ("C-c M-i" . helm-swoop)
+         ("C-x M-i" . helm-multi-swoop-all)))
+#+end_src
+
 *** Jump to char with =avy=
 Use =avy=, based on =ace-jump-mode= and =vim-easymotion=.
 
