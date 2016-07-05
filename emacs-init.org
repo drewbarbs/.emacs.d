@@ -632,7 +632,7 @@ at point STARTPOS (STARTCOL) and desired end column (STOPCOL), return the
 position of character starting column (STOPCOL+1)"
   (let ((curpos startpos)
         (curcols startcol))
-    (while (< curcols stopcol)
+    (while (<= curcols stopcol)
       (setq curcols (+ curcols (char-width (char-after curpos))))
       (setq curpos (1+ curpos)))
     curpos))
