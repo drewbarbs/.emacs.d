@@ -108,6 +108,8 @@ Clean whitespace on save, highlight whitespace in buffers.
 (defun my/enable-whitespace ()
   "Enable `whitespace-mode' and invoke `whitespace-cleanup' on file save."
   (add-hook 'before-save-hook #'whitespace-cleanup nil t)
+  ;; Run whitespace-cleanup on an Org Src buffer on "save" back to the parent file
+  (advice-add 'org-edit-src-save :before #'whitespace-cleanup)
   (whitespace-mode +1))
 
 (use-package whitespace
