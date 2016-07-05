@@ -179,7 +179,7 @@ active selection, whereas the default behavior is that text is just
 inserted at point regardless of the selection.
 
 #+begin_src emacs-lisp
-(delete-selection-mode t)
+(delete-selection-mode +1)
 #+end_src
 
 *** =auto-fill-mode=
@@ -598,12 +598,13 @@ system available.
 
 ** Global Bindings
 #+begin_src emacs-lisp
-(global-set-key "\C-cl" #'org-store-link)
-(global-set-key "\C-cb" #'org-iswitchb)
+(use-package org
+  :ensure t
+  :pin org
+  :bind (("C-c l" . org-store-link)))
 (use-package org-agenda :bind ("C-c a" . org-agenda))
 (use-package org-capture :bind ([F6] . org-capture))
 #+end_src
-
 
 ** Authoring Settings
 
@@ -723,8 +724,10 @@ Log =TODO= state transitions in the =LOGBOOK= property drawer by default.
 Leuven theme doesn't make overdue agenda items sufficiently prominent
 
 #+begin_src emacs-lisp
-(set-face-attribute 'org-scheduled-previously nil
-                    :foreground "red" :weight 'bold)
+(use-package org
+  :config
+  (set-face-attribute 'org-scheduled-previously nil
+                    :foreground "red" :weight 'bold))
 #+end_src
 
 ** Export
