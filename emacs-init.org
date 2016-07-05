@@ -103,7 +103,12 @@ Largely lifted from =prelude-editor.el=.
 #+end_src
 
 **** =whitespace-mode=
-Clean whitespace on save, highlight whitespace in buffers.
+Clean whitespace on save, highlight whitespace in buffers. A subtle
+bit here is the =advice-add= call that runs =whitespace-cleanup= on
+"save" in =Org Src= buffers. Saving in such a buffer persists the
+code block change back to the parent Org file, but it /doesn't/ run
+=before-save-hook=, so the expected behavior that whitespace is
+cleaned on =C-x C-s= doesn't occur unless you add it as function advice.
 #+begin_src emacs-lisp
 (defun my/enable-whitespace ()
   "Enable `whitespace-mode' and invoke `whitespace-cleanup' on file save."
