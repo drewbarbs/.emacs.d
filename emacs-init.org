@@ -538,6 +538,15 @@ in the minibuffer, which persists across runs of emacs.
   (savehist-mode +1))
 #+end_src
 
+*** Font-size
+
+#+begin_src emacs-lisp
+;; Font size
+(global-set-key (kbd "C-+") 'text-scale-increase)
+(global-set-key (kbd "C--") 'text-scale-decrease)
+(diminish 'text-scale-mode)
+#+end_src
+
 ** Snippets
 Fetch yasnippet, add the =other-snippets= directory to the path (where
 I pull in additional snippets via git submodules).
