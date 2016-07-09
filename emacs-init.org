@@ -290,6 +290,12 @@ act on the whole buffer if called without an active region.
 
 #+end_src
 
+*** font size
+Set font size to 12 point (height value is in 1/10 pt)
+#+begin_src emacs-lisp
+(set-face-attribute 'default nil :height 120)
+#+end_src
+
 *** Disable Window Chrome
 #+begin_src emacs-lisp
 (menu-bar-mode -1)
