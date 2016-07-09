@@ -321,6 +321,7 @@ another window
 #+begin_src emacs-lisp
 ;; show the cursor when moving after big movements in the window
 (use-package beacon
+  :diminish 'beacon-mode
   :ensure t
   :config (beacon-mode +1))
 #+end_src
