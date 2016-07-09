@@ -274,20 +274,30 @@ act on the whole buffer if called without an active region.
 
 ** Appearance
 
-*** moe-theme
+*** Theme
+Using leuven, along with powerline
+
 #+begin_src emacs-lisp
 (setq column-number-mode t)
+
+(use-package leuven-theme
+  :ensure t
+  :pin melpa
+  :init (load-theme 'leuven :no-confirm))
 
 (use-package powerline
   :ensure t
   :config
-  (use-package moe-theme
-    :ensure t
-    :config
-    (use-package moe-theme-switcher)
-    (powerline-moe-theme)))
+  (powerline-default-theme))
 #+end_src
 
+Leuven theme doesn't make overdue agenda items sufficiently prominent
+
+#+begin_src emacs-lisp
+(use-package org
+  :config
+  (set-face-attribute 'org-scheduled-previously nil
+                    :foreground "red" :weight 'bold))
 #+end_src
 
 *** font size
