@@ -274,12 +274,20 @@ act on the whole buffer if called without an active region.
 
 ** Appearance
 
-*** Leuven
+*** moe-theme
 #+begin_src emacs-lisp
-(use-package leuven-theme
-  :pin melpa
+(setq column-number-mode t)
+
+(use-package powerline
   :ensure t
-  :init (load-theme 'leuven :no-confirm))
+  :config
+  (use-package moe-theme
+    :ensure t
+    :config
+    (use-package moe-theme-switcher)
+    (powerline-moe-theme)))
+#+end_src
+
 #+end_src
 
 *** Disable Window Chrome
@@ -287,21 +295,6 @@ act on the whole buffer if called without an active region.
 (menu-bar-mode -1)
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
-#+end_src
-
-*** =smart-mode-line=
-Enable =smart-mode-line=, with the powerline theme
-
-#+begin_src emacs-lisp
-(setq column-number-mode t)
-
-(use-package smart-mode-line
-  :ensure t
-  :config
-  (setq sml/no-confirm-load-theme t)
-  ;; delegate theming to the currently active theme
-  (setq sml/theme nil)
-  (sml/setup))
 #+end_src
 
 *** Disambiguate buffers with the same name
@@ -721,14 +714,6 @@ Log =TODO= state transitions in the =LOGBOOK= property drawer by default.
 #+begin_src emacs-lisp
 (setq org-log-into-drawer t)
 #+end_src
-Leuven theme doesn't make overdue agenda items sufficiently prominent
-
-#+begin_src emacs-lisp
-(use-package org
-  :config
-  (set-face-attribute 'org-scheduled-previously nil
-                    :foreground "red" :weight 'bold))
-#+end_src
 
 ** Export
 
@@ -765,4 +750,3 @@ Turn on =helm-top-poll-mode= so that =helm-top= auto-refreshes.
 #+begin_src emacs-lisp
 (helm-top-poll-mode 1)
 #+end_src
-
