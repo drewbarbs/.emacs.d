@@ -272,6 +272,16 @@ act on the whole buffer if called without an active region.
   (with-region-or-buffer untabify))
 #+end_src
 
+*** EditorConfig
+:CUSTOM_ID: general-editorconfig
+#+begin_src emacs-lisp
+(use-package editorconfig
+  :ensure t
+  :init
+  (add-hook 'prog-mode-hook (editorconfig-mode 1))
+  (add-hook 'text-mode-hook (editorconfig-mode 1)))
+#+end_src
+
 ** Appearance
 
 *** Theme
@@ -772,13 +782,40 @@ background of code blocks to that of whatever theme I'm using"
                 my-pre-bg my-pre-fg))))))
 (add-hook 'org-export-before-processing-hook 'my/org-inline-css-hook)
 #+end_src
-* C Mode
+* C/C++ Modes
 ** Editing
+*** Format with =clang-format=
+Though we enabled general use of EditorConfig [[#general-editorconfig][above]], =clang-format= is
+superior for C/C++ code. So, we'll add a mode hook that will use it
+for indenting/formatting a region when =.clang-format= file is
+detected, and we have a =clang-format= executable.
+#+begin_src emacs-lisp
+(defvar clang-format-executable "clang-format")
+(defun my/set-clang-indent-region ()
+  (setq-local indent-region-function 'clang-format-region))
+
+(defun my/clang-format-setup ()
+  (when (and (locate-dominating-file (buffer-file-name) ".clang-format")
+             (executable-find clang-format-executable))
+      ;; Cant just set indent-region-function in c-mode-common-hook because
+      ;; it is overwritten in {c,c++}-mode-hooks
+      (add-hook 'c-mode-hook 'my/set-clang-indent-region)
+      (add-hook 'c++-mode-hook 'my/set-clang-indent-region)
+      ;; Add buffer-local save hook
+      (add-hook 'before-save-hook 'clang-format-buffer nil t)))
+
+(use-package clang-format
+  :ensure t
+  :config
+  (add-hook 'c-mode-common-hook 'my/clang-format-setup))
+#+end_src
+
 *** Disable =auto-fill-mode= except for comments
 
 #+begin_src emacs-lisp
 (add-hook 'c-mode-common-hook #'comment-auto-fill)
 #+end_src
+
 * Misc
 Turn on =helm-top-poll-mode= so that =helm-top= auto-refreshes.
 
