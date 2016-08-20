@@ -4,6 +4,14 @@
 * About
 My emacs configuration inspired by [[http://endlessparentheses.com/init-org-Without-org-mode.html][this]] and [[http://pages.sachachua.com/.emacs.d/Sacha.html][this]].
 
+* Dependencies
+The packages configured by this file require the following to be used
+to their fullest extent:
+- Emacs >= 24.5 (for magit)
+- Git >= 1.9.4 (for magit)
+- GNU Global >= (for helm-gtags)
+- =clang-format=
+
 * Personal
 #+begin_src emacs-lisp
 (setq user-full-name "Andrew Barbarello"
@@ -809,6 +817,34 @@ detected, and we have a =clang-format= executable.
   :config
   (add-hook 'c-mode-common-hook 'my/clang-format-setup))
 #+end_src
+*** =helm-gtags=
+#+begin_src emacs-lisp
+(use-package helm-gtags
+  :if (executable-find "gtags")
+  :ensure t
+  :bind (("C-c g a" . helm-gtags-tags-in-this-function)
+         ("C-j" . helm-gtags-select)
+         ("M-." . helm-gtags-dwim)
+         ("M-," . helm-gtags-pop-stack)
+         ("C-c <" . helm-gtags-previous-history)
+         ("C-c >" . helm-gtags-next-history))
+  :init
+  (setq
+   helm-gtags-ignore-case t
+   helm-gtags-auto-update t
+   helm-gtags-use-input-at-cursor t
+   helm-gtags-pulse-at-cursor t
+   helm-gtags-prefix-key "\C-cg"
+   helm-gtags-suggested-key-mapping t)
+  (add-hook 'dired-mode-hook 'helm-gtags-mode)
+  (add-hook 'eshell-mode-hook 'helm-gtags-mode)
+  (add-hook 'c-mode-hook 'helm-gtags-mode)
+  (add-hook 'c++-mode-hook 'helm-gtags-mode)
+  (add-hook 'asm-mode-hook 'helm-gtags-mode))
+#+end_src
+*** TODO =cmake-ide=
+Add =cmake-ide= so that it's used when a =CMakeLists.txt= and disable
+=helm-gtags= when =rtags= is present.
 
 *** Disable =auto-fill-mode= except for comments
 
