@@ -283,7 +283,7 @@ Using leuven, along with powerline
 (use-package leuven-theme
   :ensure t
   :pin melpa
-  :init (load-theme 'leuven :no-confirm))
+  :config (load-theme 'leuven :no-confirm))
 
 (use-package powerline
   :ensure t
