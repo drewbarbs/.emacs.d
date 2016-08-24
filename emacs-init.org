@@ -789,6 +789,9 @@ background of code blocks to that of whatever theme I'm using"
         (format "<style type=\"text/css\">\n pre.src {background-color: %s; color: %s;}</style>\n"
                 my-pre-bg my-pre-fg))))))
 (add-hook 'org-export-before-processing-hook 'my/org-inline-css-hook)
+
+;; Needed to fontify src blocks
+(use-package htmlize :ensure t)
 #+end_src
 * C/C++ Modes
 ** Editing
