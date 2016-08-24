@@ -9,7 +9,9 @@ The packages configured by this file require the following to be used
 to their fullest extent:
 - Emacs >= 24.5 (for magit)
 - Git >= 1.9.4 (for magit)
-- GNU Global >= (for helm-gtags)
+- rtags (used by cmake-ide)
+- GNU Global >= (for gtags, used as a fallback if rtags hasn't
+  indexed a project)
 - =clang-format=
 
 * Personal
@@ -821,34 +823,97 @@ detected, and we have a =clang-format= executable.
   :config
   (add-hook 'c-mode-common-hook 'my/clang-format-setup))
 #+end_src
-*** =helm-gtags=
+*** =gtags= and =rtags=
+Setup both =gtags= and =rtags=, along with some keybindings, where the
+keys will fall back to =gtags= if =GTAGS= files are present /and/
+RTags isn't running/hasn't indexed the project.
+
+Note, if in a file where neither =GTAGS= exists, nor RTags is running,
+then running, e.g. =M-.= will print the message "Can't seem to connect
+to server. Is rdm running?"
+
 #+begin_src emacs-lisp
-(use-package helm-gtags
-  :if (executable-find "gtags")
+(use-package gtags
+  :load-path ("/usr/share/global"
+              "/usr/share/gtags"
+              "/usr/local/share/global"
+              "/usr/local/share/gtags")
+  :diminish gtags-mode)
+(use-package ggtags
   :ensure t
-  :bind (("C-c g a" . helm-gtags-tags-in-this-function)
-         ("C-j" . helm-gtags-select)
-         ("M-." . helm-gtags-dwim)
-         ("M-," . helm-gtags-pop-stack)
-         ("C-c <" . helm-gtags-previous-history)
-         ("C-c >" . helm-gtags-next-history))
+  :diminish ggtags-mode)
+
+(defun use-rtags (&optional useFileManager)
+  (and (executable-find "rc")
+       (cond ((not (gtags-get-rootpath)) t)
+             ((and (not (eq major-mode 'c++-mode))
+                   (not (eq major-mode 'c-mode))) (rtags-has-filemanager))
+             (useFileManager (rtags-has-filemanager))
+             (t (and (rtags-is-running) (rtags-is-indexed))))))
+
+(defun tags-find-symbol-at-point (&optional prefix)
+  (interactive "P")
+  (if (or (not (use-rtags)) (and (not (rtags-find-symbol-at-point prefix)) rtags-last-request-not-indexed))
+      (call-interactively 'ggtags-find-definition)))
+(defun tags-find-references-at-point (&optional prefix)
+  (interactive "P")
+  (if (or (not (use-rtags)) (and (not (rtags-find-references-at-point prefix)) rtags-last-request-not-indexed))
+      (call-interactively 'ggtags-find-reference)))
+(defun tags-find-symbol ()
+  (interactive)
+  (call-interactively (if (use-rtags) 'rtags-find-symbol 'ggtags-find-definition)))
+(defun tags-find-references ()
+  (interactive)
+  (call-interactively (if (use-rtags) 'rtags-find-references 'ggtags-find-reference)))
+(defun tags-find-file ()
+  (interactive)
+  (call-interactively (if (use-rtags t) 'rtags-find-file 'gtags-find-file)))
+(defun tags-imenu ()
+  (interactive)
+  (call-interactively (if (use-rtags t) 'rtags-imenu 'idomenu)))
+
+(use-package rtags
+  :ensure t
+  ;; Need to load rtags eagerly, otherwise the cmake-ide {c,c++}-mode hooks will
+  ;; fail to launch rdm, even if it's not running
+  :demand t
   :init
-  (setq
-   helm-gtags-ignore-case t
-   helm-gtags-auto-update t
-   helm-gtags-use-input-at-cursor t
-   helm-gtags-pulse-at-cursor t
-   helm-gtags-prefix-key "\C-cg"
-   helm-gtags-suggested-key-mapping t)
-  (add-hook 'dired-mode-hook 'helm-gtags-mode)
-  (add-hook 'eshell-mode-hook 'helm-gtags-mode)
-  (add-hook 'c-mode-hook 'helm-gtags-mode)
-  (add-hook 'c++-mode-hook 'helm-gtags-mode)
-  (add-hook 'asm-mode-hook 'helm-gtags-mode))
+  (setq rtags-completions-enabled t)
+  :bind
+  (("M-." . tags-find-symbol-at-point)
+   ("M-," . tags-find-references-at-point)
+   ("M-;" . tags-find-file)
+   ("C-." . tags-find-symbol)
+   ("C-," . tags-find-references)
+   ("C-<" . rtags-find-virtuals-at-point)
+   :map c-mode-base-map
+   ("M-." . tags-find-symbol-at-point)
+   ("M-," . tags-find-references-at-point)
+   ("M-;" . tags-find-file)
+   ("C-." . tags-find-symbol)
+   ("C-," . tags-find-references)
+   ("C-<" . rtags-find-virtuals-at-point)))
 #+end_src
-*** TODO =cmake-ide=
-Add =cmake-ide= so that it's used when a =CMakeLists.txt= and disable
-=helm-gtags= when =rtags= is present.
+*** =cmake-ide=
+#+begin_src emacs-lisp
+(defun parse-inc-paths (clang-output)
+  (let ((include-paths (split-string
+                       (replace-regexp-in-string
+                        "^[^\\`]*#include <...> search starts here:\\([^\\`]*\\)End of search list[^\\`]*" "\\1" clang-output))))
+    (mapcar (lambda (item)(concat "-I" item)) include-paths)))
+
+;; (if (executable-find "clang")
+;;     (setq cmake-ide-flags-c (parse-inc-paths
+;;                              (shell-command-to-string "clang -x c -E -v - < /dev/null"))))
+;; (if (executable-find "clang++")
+;;     (setq cmake-ide-flags-c++ (parse-inc-paths
+;;                              (shell-command-to-string "clang++ -x c++ -E -v - < /dev/null"))))
+
+(use-package cmake-ide
+  :ensure t
+  :config (require 'subr-x) (cmake-ide-setup))
+#+end_src
+
 
 *** Disable =auto-fill-mode= except for comments
 
