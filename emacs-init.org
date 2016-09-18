@@ -457,6 +457,12 @@ project directory.
       `((".*" ,temporary-file-directory t)))
 #+end_src
 
+*** Don't ring bell on macOS
+That behavior is annoying
+#+begin_src emacs-lisp
+(setq ring-bell-function #'ignore)
+#+end_src
+
 ** Navigation
 *** =helm=
 An all-encompassing completion package. See [[https://github.com/emacs-helm/helm/wiki#helm-interaction-model][here]] for
