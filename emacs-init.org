@@ -929,7 +929,14 @@ to server. Is rdm running?"
 (add-hook 'c-mode-common-hook #'comment-auto-fill)
 #+end_src
 
-* Misc
+* Misc Modes
+** Markdown
+#+srcname: name
+#+begin_src emacs-lisp
+(use-package markdown-mode :ensure t :mode "\\.md\\'")
+#+end_src
+
+* Misc config
 Turn on =helm-top-poll-mode= so that =helm-top= auto-refreshes.
 
 #+begin_src emacs-lisp
