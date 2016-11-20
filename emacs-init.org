@@ -287,6 +287,7 @@ act on the whole buffer if called without an active region.
 #+begin_src emacs-lisp
 (use-package editorconfig
   :ensure t
+  :diminish editorconfig-mode
   :init
   (add-hook 'prog-mode-hook (editorconfig-mode 1))
   (add-hook 'text-mode-hook (editorconfig-mode 1)))
