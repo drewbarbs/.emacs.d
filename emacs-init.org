@@ -868,14 +868,12 @@ to server. Is rdm running?"
   :bind
   (("M-." . tags-find-symbol-at-point)
    ("M-," . tags-find-references-at-point)
-   ("M-;" . tags-find-file)
    ("C-." . tags-find-symbol)
    ("C-," . tags-find-references)
    ("C-<" . rtags-find-virtuals-at-point)
    :map c-mode-base-map
    ("M-." . tags-find-symbol-at-point)
    ("M-," . tags-find-references-at-point)
-   ("M-;" . tags-find-file)
    ("C-." . tags-find-symbol)
    ("C-," . tags-find-references)
    ("C-<" . rtags-find-virtuals-at-point)))
