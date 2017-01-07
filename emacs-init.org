@@ -866,12 +866,8 @@ to server. Is rdm running?"
   :init
   (setq rtags-completions-enabled t)
   :bind
-  (("M-." . tags-find-symbol-at-point)
-   ("M-," . tags-find-references-at-point)
-   ("C-." . tags-find-symbol)
-   ("C-," . tags-find-references)
-   ("C-<" . rtags-find-virtuals-at-point)
-   :map c-mode-base-map
+  (:map c-mode-base-map
+   ("M-*" . pop-tag-mark)
    ("M-." . tags-find-symbol-at-point)
    ("M-," . tags-find-references-at-point)
    ("C-." . tags-find-symbol)
