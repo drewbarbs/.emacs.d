@@ -192,6 +192,23 @@ disable auto-fill except for on comments. Taken from [[https://www.emacswiki.org
 
 *** Expand at point
 
+**** =company-mode=
+#+begin_src emacs-lisp
+(use-package company
+  :ensure t
+  :init (global-company-mode)
+  :config
+  (setq company-tooltip-align-annotations t)
+  ;; Easy navigation to candidates with M-<n>
+  (setq company-show-numbers t)
+  (setq company-dabbrev-downcase nil)
+  (add-hook 'c-initialization-hook
+            (lambda ()
+              (define-key c-mode-base-map (kbd "M-/") #'company-complete)))
+  :diminish company-mode)
+#+end_src
+
+
 **** =hippie-expand=
 Setup =hippie-expand=, which completes the word before point using one
 of a variety of sources. Another bit of config taken verbatim from
