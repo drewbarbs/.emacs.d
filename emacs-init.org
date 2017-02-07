@@ -13,6 +13,7 @@ to their fullest extent:
 - GNU Global >= (for gtags, used as a fallback if rtags hasn't
   indexed a project)
 - =clang-format=
+- Python + IPython >= 5 + Jupyter >= 1.0 for [[https://github.com/gregsexton/ob-ipython][ob-ipython]]
 
 * Personal
 #+begin_src emacs-lisp
@@ -764,6 +765,19 @@ be marked as entending past line length LIMIT."
 
 (add-hook 'org-mode-hook 'my/org-bline-minor-mode--insin)
 #+end_src
+** Org Babel
+*** =ob-ipython=
+From [[https://github.com/gregsexton/ob-ipython][here]].
+#+begin_src emacs-lisp
+(use-package ob-ipython
+  :ensure t
+  :pin melpa
+  :config
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((ipython . t))))
+#+end_src
+
 
 ** Tracking TODOs and Agenda
 Log =TODO= state transitions in the =LOGBOOK= property drawer by default.
@@ -817,7 +831,6 @@ holding contextual information."
   (org-latex--wrap-label
    quote-block (format "\\begin{quote}\n``%s''\\end{quote}" contents) info))
 #+end_src
-
 
 * C/C++ Modes
 ** Editing
