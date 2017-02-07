@@ -628,7 +628,10 @@ Flyspell config, appropriate from Prelude.
 (defun prelude-enable-flyspell ()
   "Enable command `flyspell-mode' if ispell program is available"
   (when (executable-find ispell-program-name)
-    (flyspell-mode +1)))
+    (flyspell-mode +1)
+    ;; enable the flyspell word correction dialog when there's a window system
+    (if window-system
+        (global-set-key (kbd "M-$") 'flyspell-correct-word-before-point))))
 
 (use-package flyspell
   :ensure t
@@ -637,12 +640,6 @@ Flyspell config, appropriate from Prelude.
   (setq ispell-program-name "aspell" ; use aspell instead of ispell
         ispell-extra-args '("--sug-mode=ultra"))
   (add-hook 'text-mode-hook #'prelude-enable-flyspell))
-#+end_src
-
-Enable the Flyspell word correction dialog when there's a window
-system available.
-#+begin_src emacs-lisp
-(if window-system (global-set-key (kbd "M-$") 'flyspell-correct-word-before-point))
 #+end_src
 
 * Org Mode
