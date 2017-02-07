@@ -796,6 +796,29 @@ background of code blocks to that of whatever theme I'm using"
 ;; Needed to fontify src blocks
 (use-package htmlize :ensure t)
 #+end_src
+
+*** Smart Quotes
+This feature came to Org in version 8, and it's crazy to me that it's
+not the default. It lets you type "normal quotes" in the org buffer,
+as opposed to =``this latex stuff''=, and will transform them on
+export so that your HTML/text output looks nice /and/ your latex
+export looks nice!
+
+#+begin_src emacs-lisp
+(setq org-export-with-smart-quotes t)
+#+end_src
+
+*** Latex quote blocks
+#+begin_src emacs-lisp
+(defun org-latex-quote-block (quote-block contents info)
+  "Transcode a QUOTE-BLOCK element from Org to LaTeX.
+CONTENTS holds the contents of the block.  INFO is a plist
+holding contextual information."
+  (org-latex--wrap-label
+   quote-block (format "\\begin{quote}\n``%s''\\end{quote}" contents) info))
+#+end_src
+
+
 * C/C++ Modes
 ** Editing
 *** Format with =clang-format=
