@@ -1,0 +1,14 @@
+#+TITLE: My Babel Library
+* Sympy
+The following is intended for use with code blocks using Sympy to
+generate a Latex result
+#+name: wrap-math
+#+begin_src emacs-lisp :var body=""
+(concat "\\[\n" body "\n\\]")
+#+end_src
+
+Example usage
+: #+begin_src python :session :results value :post wrap-math(body=*this*)
+: from sympy import *
+: latex(eye(3))
+: #+end_src

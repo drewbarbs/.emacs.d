@@ -768,6 +768,12 @@ be marked as entending past line length LIMIT."
 (add-hook 'org-mode-hook 'my/org-bline-minor-mode--insin)
 #+end_src
 ** Org Babel
+*** Personal Library Of Babel
+Load custom functions I would like to be available in all org buffers
+#+begin_src emacs-lisp
+(org-babel-lob-ingest (expand-file-name "lob.org" init-dir))
+#+end_src
+
 *** =ob-ipython=
 From [[https://github.com/gregsexton/ob-ipython][here]].
 #+begin_src emacs-lisp
