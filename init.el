@@ -2,13 +2,8 @@
 ;; package.el. This has the benefit of ensuring the latest org-mode is
 ;; used to load the emacs-init.org script
 (require 'package)
-(setq my/package-archives '(("melpa" . "https://melpa.org/packages/")
-                            ("org" . "http://orgmode.org/elpa/")))
-(mapc (lambda (archive)
-        (let ((id (car archive))
-              (location (cdr archive)))
-          (unless (assoc-default id package-archives)
-            (add-to-list 'package-archives archive t)))) my/package-archives)
+(setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
+                         ("melpa" . "https://melpa.org/packages/")))
 ;; This modifies the load path
 (package-initialize)
 
