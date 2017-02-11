@@ -768,6 +768,14 @@ be marked as entending past line length LIMIT."
 (add-hook 'org-mode-hook 'my/org-bline-minor-mode--insin)
 #+end_src
 ** Org Babel
+#+begin_src emacs-lisp
+(setq org-confirm-babel-evaluate nil)
+(eval-after-load 'org
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((python . t)
+     (shell . t))))
+#+end_src
 *** Personal Library Of Babel
 Load custom functions I would like to be available in all org buffers
 #+begin_src emacs-lisp
