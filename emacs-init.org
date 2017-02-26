@@ -119,13 +119,18 @@ cleaned on =C-x C-s= doesn't occur unless you add it as function advice.
   (advice-add 'org-edit-src-save :before #'whitespace-cleanup)
   (whitespace-mode +1))
 
+;; In some programming modes, I want more wiggle room before line length warning
+(defun my/bump-line-len ()
+  (setq whitespace-line-column 110))
+
 (use-package whitespace
   :diminish whitespace-mode
   :config
   (setq whitespace-line-column 80)
   (setq whitespace-style '(face tabs empty trailing lines-tail))
   (add-hook 'text-mode-hook #'my/enable-whitespace)
-  (add-hook 'prog-mode-hook #'my/enable-whitespace))
+  (add-hook 'prog-mode-hook #'my/enable-whitespace)
+  (add-hook 'python-mode-hook #'my/bump-line-len))
 #+end_src
 
 *** Matching pairs (=smartparens-mode= and more)
@@ -954,6 +959,7 @@ holding contextual information."
    quote-block (format "\\begin{quote}\n``%s''\\end{quote}" contents) info))
 #+end_src
 
+
 ** Open URLs in Firefox
 #+begin_src emacs-lisp
 (setq org-file-apps
@@ -962,6 +968,16 @@ holding contextual information."
       ("\\.mm\\'" . default)
       ("\\.x?html?\\'" . "firefox %s")
       ("\\.pdf\\'" . default))))
+#+end_src
+
+* Blog
+A setup for authoring blog posts using org mode, taken from [[http://endlessparentheses.com/how-i-blog-one-year-of-posts-in-a-single-org-file.html][Endless Parentheses]].
+#+begin_src emacs-lisp
+(defvar endless/blog-base-url "http://dbarbs.net/")
+(defvar endless/blog-dir nil)
+
+(add-to-list 'load-path (expand-file-name "ox-pelican-subtree" init-dir))
+(require 'ox-pelican-subtree)
 #+end_src
 
 * C/C++ Modes

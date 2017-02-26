@@ -4,3 +4,6 @@
 [submodule "other-snippets/org-mode"]
 	path = other-snippets/org-mode
 	url = git@github.com:drewbarbs/yasnippet-org-mode.git
+[submodule "ox-pelican-subtree"]
+	path = ox-pelican-subtree
+	url = git@github.com:drewbarbs/ox-pelican-subtree.git
