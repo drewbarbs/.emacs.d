@@ -117,13 +117,18 @@ cleaned on =C-x C-s= doesn't occur unless you add it as function advice.
   (advice-add 'org-edit-src-save :before #'whitespace-cleanup)
   (whitespace-mode +1))
 
+;; In some programming modes, I want more wiggle room before line length warning
+(defun my/bump-line-len ()
+  (setq whitespace-line-column 110))
+
 (use-package whitespace
   :diminish whitespace-mode
   :config
   (setq whitespace-line-column 80)
   (setq whitespace-style '(face tabs empty trailing lines-tail))
   (add-hook 'text-mode-hook #'my/enable-whitespace)
-  (add-hook 'prog-mode-hook #'my/enable-whitespace))
+  (add-hook 'prog-mode-hook #'my/enable-whitespace)
+  (add-hook 'python-mode-hook #'my/bump-line-len))
 #+end_src
 
 *** Matching pairs (=smartparens-mode= and more)
@@ -657,6 +662,23 @@ Flyspell config, appropriate from Prelude.
 (use-package org-agenda :bind ("C-c a" . org-agenda))
 (use-package org-capture :bind ([F6] . org-capture))
 #+end_src
+*** Org-Ref
+A very cool/helpful package to manage citations in org file/take notes
+for citations.
+
+#+begin_src emacs-lisp
+(defun my/org-ref-bibliography-format (orig-format keyword desc format)
+  (cond
+   ((eq format 'md) "")
+   (t (apply orig-format keyword desc format nil))))
+
+(use-package org-ref
+  :ensure t
+  :config
+  (advice-add #'org-ref-bibliography-format
+              :around #'my/org-ref-bibliography-format))
+#+end_src
+
 
 ** Authoring Settings
 
@@ -846,6 +868,35 @@ holding contextual information."
   (org-latex--wrap-label
    quote-block (format "\\begin{quote}\n``%s''\\end{quote}" contents) info))
 #+end_src
+
+* Blog
+#+begin_src emacs-lisp
+(defvar endless/blog-base-url "http://dbarbs.net/")
+(defvar endless/blog-dir nil)
+
+(setq org-jekyll-use-src-plugin t)
+(add-to-list 'load-path (expand-file-name "ox-pelican-subtree" init-dir))
+(require 'ox-jekyll-subtree)
+#+end_src
+
+** TODO Bringing it home
+Here's how I'm going to do the blog:
+
+*** TODO Finish modifying =ox-jakyll= [/]
+
+1. [ ] Change it to =ox-pelican=
+2. [ ] Change footnotes to use the markdown export backend
+3. [ ] Change codeblock export so that it uses the =.numberLines= and
+   =startFrom= attributes when the org source block has =-n= or =+n= [[http://pandoc.org/MANUAL.html#extension-fenced_code_attributes][doc]]
+
+*** TODO Change Pelican config [/]
+1. [ ] Use the [[https://github.com/liob/pandoc_reader][pandoc_reader]] pelican markdown reader/get rid of the
+   codeblock line numbering stuff.
+2. [ ] Change =PANDOC_ARGS= config of =pandoc_reader= to include
+
+   =--bibliography ../refs.bib --filter pandoc-citeproc--csl
+   acm-sig-proceedings=
+
 
 * C/C++ Modes
 ** Editing
