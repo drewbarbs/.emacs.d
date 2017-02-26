@@ -4,7 +4,7 @@ The following is intended for use with code blocks using Sympy to
 generate a Latex result
 #+name: wrap-math
 #+begin_src emacs-lisp :var body=""
-(concat "\\[\n" body "\n\\]")
+(concat "$$\n" body "\n$$")
 #+end_src
 
 Example usage
