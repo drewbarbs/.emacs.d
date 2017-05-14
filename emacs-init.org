@@ -209,6 +209,8 @@ disable auto-fill except for on comments. Taken from [[https://www.emacswiki.org
   (add-hook 'c-initialization-hook
             (lambda ()
               (define-key c-mode-base-map (kbd "M-/") #'company-complete)))
+  (define-key company-active-map (kbd "C-n") 'company-select-next-or-abort)
+  (define-key company-active-map (kbd "C-p") 'company-select-previous-or-abort)
   :diminish company-mode)
 #+end_src
 
@@ -946,6 +948,11 @@ to server. Is rdm running?"
    ("M-<left>" . rtags-location-stack-back)
    ("M-<right>" . rtags-location-stack-forward)))
 #+end_src
+*** =cmake-mode=
+#+begin_src emacs-lisp
+(use-package cmake-mode :ensure t)
+#+end_src
+
 *** =cmake-ide=
 #+begin_src emacs-lisp
 (defun parse-inc-paths (clang-output)
