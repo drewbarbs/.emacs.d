@@ -302,6 +302,14 @@ act on the whole buffer if called without an active region.
   (add-hook 'text-mode-hook (editorconfig-mode 1)))
 #+end_src
 
+*** =flycheck=
+#+begin_src emacs-lisp
+(use-package flycheck
+  :ensure t
+  :config
+  (add-hook 'after-init-hook #'global-flycheck-mode))
+#+end_src
+
 ** Appearance
 
 *** Theme
