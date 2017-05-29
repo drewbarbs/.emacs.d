@@ -857,6 +857,16 @@ holding contextual information."
    quote-block (format "\\begin{quote}\n``%s''\\end{quote}" contents) info))
 #+end_src
 
+** Open URLs in Firefox
+#+begin_src emacs-lisp
+(setq org-file-apps
+    (quote
+      ((auto-mode . emacs)
+      ("\\.mm\\'" . default)
+      ("\\.x?html?\\'" . "firefox %s")
+      ("\\.pdf\\'" . default))))
+#+end_src
+
 * C/C++ Modes
 ** Editing
 *** Format with =clang-format=
