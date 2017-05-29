@@ -32,6 +32,8 @@ to their fullest extent:
 ;; equivalent of prelude-dir
 (defvar init-dir user-emacs-directory
   "The root dir of the Emacs configuration.")
+
+(add-to-list 'load-path (expand-file-name "misc" init-dir))
 #+end_src
 
 ** Package archives
@@ -688,7 +690,19 @@ for citations.
   :ensure t
   :config
   (advice-add #'org-ref-bibliography-format
-              :around #'my/org-ref-bibliography-format))
+              :around #'my/org-ref-bibliography-format)
+  (require 'org-ref-citeproc)
+  (defun orcp-collect-citations ()
+    "Return a list of citation links in the document."
+    (setq *orcp-citation-links*
+          (cl-loop for link in (org-element-map
+                                   (org-element-parse-buffer) 'link 'identity nil nil nil t)
+                   if (-contains?
+                       org-ref-cite-types
+                       (org-element-property :type link))
+                   collect link)))
+  (defun orcp-url (entry)
+    (orcp-get-entry-field "url" entry)))
 #+end_src
 
 
