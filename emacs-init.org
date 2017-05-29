@@ -667,6 +667,23 @@ Flyspell config, appropriate from Prelude.
 (use-package org-agenda :bind ("C-c a" . org-agenda))
 (use-package org-capture :bind ([F6] . org-capture))
 #+end_src
+*** Org-Ref
+A very cool/helpful package to manage citations in org file/take notes
+for citations.
+
+#+begin_src emacs-lisp
+(defun my/org-ref-bibliography-format (orig-format keyword desc format)
+  (cond
+   ((eq format 'md) "")
+   (t (apply orig-format keyword desc format nil))))
+
+(use-package org-ref
+  :ensure t
+  :config
+  (advice-add #'org-ref-bibliography-format
+              :around #'my/org-ref-bibliography-format))
+#+end_src
+
 
 ** Authoring Settings
 
