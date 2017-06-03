@@ -1043,6 +1043,16 @@ to server. Is rdm running?"
 #+begin_src emacs-lisp
 (use-package markdown-mode :ensure t :mode "\\.md\\'")
 #+end_src
+** =glsl-mode=
+#+begin_src emacs-lisp
+(use-package glsl-mode
+  :ensure t
+  :config
+  (add-to-list 'auto-mode-alist '("\\.glsl\\'" . glsl-mode))
+  (add-to-list 'auto-mode-alist '("\\.vert\\'" . glsl-mode))
+  (add-to-list 'auto-mode-alist '("\\.frag\\'" . glsl-mode))
+  (add-to-list 'auto-mode-alist '("\\.geom\\'" . glsl-mode)))
+#+end_src
 
 * Misc config
 Turn on =helm-top-poll-mode= so that =helm-top= auto-refreshes.
