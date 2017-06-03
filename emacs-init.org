@@ -308,6 +308,7 @@ act on the whole buffer if called without an active region.
 #+begin_src emacs-lisp
 (use-package flycheck
   :ensure t
+  :diminish flycheck-mode
   :config
   (add-hook 'after-init-hook #'global-flycheck-mode))
 #+end_src
