@@ -1055,6 +1055,14 @@ to server. Is rdm running?"
   :config (require 'subr-x) (cmake-ide-setup))
 #+end_src
 
+*** Open .h files in C++ mode by default
+If in a plain old C project and want =.h= files to be opened in
+=c-mode= add the following to =dir-locals.el= to achieve this (as
+described [[https://stackoverflow.com/a/6912415][here]]): =((c++-mode . ((mode . c))))=
+#+begin_src emacs-lisp
+(add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
+#+end_src
+
 
 *** Disable =auto-fill-mode= except for comments
 
