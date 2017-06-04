@@ -603,6 +603,21 @@ in the minibuffer, which persists across runs of emacs.
 (diminish 'text-scale-mode)
 #+end_src
 
+*** =projectile=
+#+begin_src emacs-lisp
+(use-package projectile
+  :ensure t
+  :config
+  (projectile-global-mode))
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package helm-projectile
+  :ensure t
+  :config
+  (helm-projectile-on))
+#+end_src
+
 ** Snippets
 Fetch yasnippet, add the =other-snippets= directory to the path (where
 I pull in additional snippets via git submodules).
