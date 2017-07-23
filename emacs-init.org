@@ -700,7 +700,7 @@ Flyspell config, appropriate from Prelude.
          ("M-p" . org-metaup)
          ("M-n" . org-metadown)))
 (use-package org-agenda :bind ("C-c a" . org-agenda))
-(use-package org-capture :bind ([F6] . org-capture))
+(use-package org-capture :bind ([f6] . org-capture))
 #+end_src
 *** Org-Ref
 A very cool/helpful package to manage citations in org file/take notes
@@ -731,9 +731,13 @@ for citations.
     (orcp-get-entry-field "url" entry)))
 #+end_src
 
-
 ** Authoring Settings
-
+*** Don't try and insert blank lines before new headings
+#+srcname: name
+#+begin_src emacs-lisp
+(setq org-blank-before-new-entry (assq-delete-all 'heading org-blank-before-new-entry))
+(push '(heading . nil) org-blank-before-new-entry)
+#+end_src
 *** Source block indentation
 Disable Org's default behavior of indenting code from a source block
 with spaces after saving back to buffer from =org-edit-src-code= (C-c ')
