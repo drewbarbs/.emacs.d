@@ -845,6 +845,20 @@ be marked as entending past line length LIMIT."
 
 (add-hook 'org-mode-hook 'my/org-bline-minor-mode--insin)
 #+end_src
+*** =cdlatex= mode
+#+begin_src emacs-lisp
+(use-package auctex
+  :ensure t
+  :defer t
+  :config
+  (load "auctex.el" nil t t)
+  (load "preview-latex.el" nil t t))
+(use-package cdlatex
+  :ensure t
+  :diminish org-cdlatex-mode
+  :config
+  (add-hook 'org-mode-hook #'turn-on-org-cdlatex))
+#+end_src
 ** Org Babel
 #+begin_src emacs-lisp
 (setq org-confirm-babel-evaluate nil)
