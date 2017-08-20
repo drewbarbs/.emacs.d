@@ -688,6 +688,20 @@ Flyspell config, appropriate from Prelude.
         ispell-extra-args '("--sug-mode=ultra"))
   (add-hook 'text-mode-hook #'prelude-enable-flyspell))
 #+end_src
+** =devhelp=
+#+begin_src emacs-lisp
+(setq my/devhelp-path (executable-find "devhelp"))
+;; adapted from https://git.gnome.org/browse/devhelp/tree/misc/devhelp.el
+(defun my/devhelp-word-at-point ()
+  "Searches for the current word in devhelp, if available"
+  (interactive)
+  (if (not my/devhelp-path)
+      (message "devhelp executable could not be located")
+    (start-process-shell-command "devhelp" nil
+                                 (mapconcat #'identity (list my/devhelp-path "-s" (current-word)) " "))
+    (set-process-query-on-exit-flag (get-process "devhelp") nil)))
+(global-set-key [f7] #'my/devhelp-word-at-point)
+#+end_src
 
 * Org Mode
 ** Global Bindings
