@@ -669,7 +669,6 @@ Useful for diffing org mode
 (add-hook 'ediff-prepare-buffer-hook #'outline-show-all)
 #+end_src
 
-
 ** =flyspell-mode=
 Flyspell config, appropriate from Prelude.
 #+begin_src emacs-lisp
@@ -857,7 +856,9 @@ be marked as entending past line length LIMIT."
   :ensure t
   :diminish org-cdlatex-mode
   :config
-  (add-hook 'org-mode-hook #'turn-on-org-cdlatex))
+  (add-hook 'org-mode-hook #'turn-on-org-cdlatex)
+  (setq cdlatex-math-modify-alist
+             '((?B "\\mathbb" "\\textbb" t nil nil))))
 #+end_src
 ** Org Babel
 #+begin_src emacs-lisp
