@@ -1086,19 +1086,6 @@ to server. Is rdm running?"
 
 *** =cmake-ide=
 #+begin_src emacs-lisp
-(defun parse-inc-paths (clang-output)
-  (let ((include-paths (split-string
-                       (replace-regexp-in-string
-                        "^[^\\`]*#include <...> search starts here:\\([^\\`]*\\)End of search list[^\\`]*" "\\1" clang-output))))
-    (mapcar (lambda (item)(concat "-I" item)) include-paths)))
-
-;; (if (executable-find "clang")
-;;     (setq cmake-ide-flags-c (parse-inc-paths
-;;                              (shell-command-to-string "clang -x c -E -v - < /dev/null"))))
-;; (if (executable-find "clang++")
-;;     (setq cmake-ide-flags-c++ (parse-inc-paths
-;;                              (shell-command-to-string "clang++ -x c++ -E -v - < /dev/null"))))
-
 (use-package cmake-ide
   :ensure t
   :config (require 'subr-x) (cmake-ide-setup))
