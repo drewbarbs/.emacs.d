@@ -763,6 +763,12 @@ with spaces after saving back to buffer from =org-edit-src-code= (C-c ')
 (setq org-edit-src-content-indentation 0)
 (setq org-edit-src-preserve-indentation nil)
 #+end_src
+
+*** Allow ordered lists with letters
+#+begin_src emacs-lisp
+(setq org-list-allow-alphabetical t)
+#+end_src
+
 *** Whitespace mode
 Fix whitespace mode's naive =lines-tail= highlighting, so that only
 the /description text/ of org mode links counts against the
