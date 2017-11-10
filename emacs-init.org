@@ -527,7 +527,11 @@ To "helm" a command, use the =helm-command-prefix-key=: =C-x c=. E.g.
          ("C-x b" . helm-buffers-list)
          ("M-y" . helm-show-kill-ring)
          ("C-x C-b" . helm-mini)
-         ("C-x C-f" . helm-find-files)))
+         ("C-x C-f" . helm-find-files))
+  :config
+  (add-hook 'eshell-mode-hook
+            (lambda ()
+              (define-key eshell-mode-map (kbd "M-r") #'helm-eshell-history))))
 #+end_src
 
 Add =helm-swoop=, which is like a souped-up =occur=. It moves the
@@ -726,7 +730,14 @@ Flyspell config, appropriate from Prelude.
     (set-process-query-on-exit-flag (get-process "devhelp") nil)))
 (global-set-key [f7] #'my/devhelp-word-at-point)
 #+end_src
-
+* Eshell
+#+begin_src emacs-lisp
+(add-hook 'eshell-mode-hook
+          (lambda ()
+            (add-to-list 'eshell-visual-commands "pacman")
+            (add-to-list 'eshell-visual-commands "pacaur")
+            (add-to-list 'eshell-visual-subcommands '("git" "log" "diff" "show"))))
+#+end_src
 * Org Mode
 ** Global Bindings
 #+begin_src emacs-lisp
