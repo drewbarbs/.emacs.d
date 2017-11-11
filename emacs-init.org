@@ -355,10 +355,25 @@ Leuven theme doesn't make overdue agenda items sufficiently prominent
                     :foreground "red" :weight 'bold))
 #+end_src
 
-*** font size
+*** Font
 Set font size to 12 point (height value is in 1/10 pt)
 #+begin_src emacs-lisp
 (set-face-attribute 'default nil :height 120)
+(defun my/have-font (f)
+  (member f (font-family-list)))
+
+(defun my/setup-fonts (f)
+  (when f
+    (select-frame f))
+  (let ((ft
+         (cond ((my/have-font "Source Sans Pro") '(:font "Source Sans Pro"))
+               ((my/have-font "Lucida Grande") '(:font "Lucida Grande"))
+               ((my/have-font "Sans Serif") '(:family "Sans Serif")))))
+    (eval `(set-face-attribute 'variable-pitch nil ,@ft)))
+  (when (my/have-font "Source Code Pro")
+    (set-face-attribute 'default nil :font "Source Code Pro" :height 120)))
+(add-hook 'after-make-frame-functions #'my/setup-fonts)
+(my/setup-fonts nil)
 #+end_src
 
 *** Disable Window Chrome
@@ -715,12 +730,26 @@ Flyspell config, appropriate from Prelude.
 * Org Mode
 ** Global Bindings
 #+begin_src emacs-lisp
+(defun my/org-set-face ()
+  (variable-pitch-mode)
+  (diminish 'buffer-face-mode)
+  (dolist (face '(org-block-begin-line
+                  org-block-end-line
+                  org-verbatim
+                  org-code
+                  org-block
+                  font-lock-keyword-face))
+    (set-face-attribute face nil :inherit 'fixed-pitch))
+  (setq org-hide-emphasis-markers t))
+
 (use-package org
   :pin gnu
   :ensure t
   :bind (("C-c l" . org-store-link)
          ("M-p" . org-metaup)
-         ("M-n" . org-metadown)))
+         ("M-n" . org-metadown))
+  :config
+  (add-hook 'org-mode-hook #'my/org-set-face))
 (use-package org-agenda :bind ("C-c a" . org-agenda))
 (use-package org-capture :bind ([f6] . org-capture))
 #+end_src
