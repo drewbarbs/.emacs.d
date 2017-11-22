@@ -1048,22 +1048,24 @@ for indenting/formatting a region when =.clang-format= file is
 detected, and we have a =clang-format= executable.
 #+begin_src emacs-lisp
 (defvar clang-format-executable "clang-format")
-(defun my/set-clang-indent-region ()
-  (setq-local indent-region-function 'clang-format-region))
 
-(defun my/clang-format-setup ()
-  (when (and (buffer-file-name)
-             (locate-dominating-file (buffer-file-name) ".clang-format")
-             (executable-find clang-format-executable))
-      ;; Cant just set indent-region-function in c-mode-common-hook because
-      ;; it is overwritten in {c,c++}-mode-hooks
-      (add-hook 'c-mode-hook 'my/set-clang-indent-region)
-      (add-hook 'c++-mode-hook 'my/set-clang-indent-region)))
+(defun my/use-clang-format ()
+  (and (buffer-file-name)
+       (locate-dominating-file (buffer-file-name) ".clang-format")
+       (executable-find clang-format-executable)))
+
+(defun my/maybe-set-clang-indent-region ()
+  (when (my/use-clang-format)
+    (setq-local indent-region-function #'clang-format-region)
+    (add-hook 'before-save-hook #'clang-format-buffer nil t)))
 
 (use-package clang-format
   :ensure t
   :config
-  (add-hook 'c-mode-common-hook 'my/clang-format-setup))
+  ;; Cant just set indent-region-function in c-mode-common-hook because
+  ;; it is overwritten in {c,c++}-mode-hooks
+  (add-hook 'c-mode-hook #'my/maybe-set-clang-indent-region)
+  (add-hook 'c++-mode-hook #'my/maybe-set-clang-indent-region))
 #+end_src
 *** Use =electric-pair-mode=
 This is great for auto-inserting closing parentheses, doing the right
