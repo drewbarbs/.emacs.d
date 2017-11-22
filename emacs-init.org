@@ -405,6 +405,15 @@ another window
 #+end_src
 
 ** Behavior
+*** Ask for confirmation before quitting
+#+begin_src emacs-lisp
+(defun my/confirm-kill-eclient ()
+  (interactive)
+  (if (yes-or-no-p "Are you sure you want to exit Emacs? ")
+      (save-buffers-kill-terminal)))
+(global-set-key (kbd "C-x C-c") #'my/confirm-kill-eclient)
+#+end_src
+
 *** Auto refresh buffer when associated file changes
 #+srcname: name
 #+begin_src emacs-lisp
