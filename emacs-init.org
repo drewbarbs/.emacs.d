@@ -1056,6 +1056,18 @@ detected, and we have a =clang-format= executable.
   :config
   (add-hook 'c-mode-common-hook 'my/clang-format-setup))
 #+end_src
+*** Use =electric-pair-mode=
+This is great for auto-inserting closing parentheses, doing the right
+thing when I press "Enter" on the opening brace of a function
+definition (thanks to =electric-indent-mode=), etc.
+#+begin_src emacs-lisp
+(defun my/turn-on-local-electric-pair ()
+  (electric-pair-local-mode +1))
+
+(add-hook 'c-mode-hook #'my/turn-on-local-electric-pair)
+(add-hook 'c++-mode-hook #'my/turn-on-local-electric-pair)
+#+end_src
+
 *** =gtags= and =rtags=
 Setup both =gtags= and =rtags=, along with some keybindings, where the
 keys will fall back to =gtags= if =GTAGS= files are present /and/
