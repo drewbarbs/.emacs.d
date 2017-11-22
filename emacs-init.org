@@ -1069,7 +1069,7 @@ detected, and we have a =clang-format= executable.
   ;; Cant just set indent-region-function in c-mode-common-hook because
   ;; it is overwritten in {c,c++}-mode-hooks
   (add-hook 'c-mode-hook #'my/maybe-set-clang-indent-region)
-  (add-hook 'c++-mode-hook #'my/maybe-set-clang-indent-region))
+  (add-hook 'c++-mode-hook #'my/maybe-set-clang-indent-region nil t))
 #+end_src
 *** Use =electric-pair-mode=
 This is great for auto-inserting closing parentheses, doing the right
