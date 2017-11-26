@@ -309,7 +309,10 @@ act on the whole buffer if called without an active region.
 #+end_src
 
 *** EditorConfig
-:CUSTOM_ID: general-editorconfig
+    :PROPERTIES:
+    :CUSTOM_ID: general-editorconfig
+    :END:
+
 #+begin_src emacs-lisp
 (use-package editorconfig
   :ensure t
