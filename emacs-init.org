@@ -754,7 +754,7 @@ Flyspell config, appropriate from Prelude.
 ** Global Bindings
 #+begin_src emacs-lisp
 (defun my/org-set-face ()
-  (variable-pitch-mode)
+  (variable-pitch-mode +1)
   (diminish 'buffer-face-mode)
   (dolist (face '(org-block-begin-line
                   org-block-end-line
