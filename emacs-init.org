@@ -959,13 +959,14 @@ Load custom functions I would like to be available in all org buffers
 *** =ob-ipython=
 From [[https://github.com/gregsexton/ob-ipython][here]].
 #+begin_src emacs-lisp
-(use-package ob-ipython
-  :ensure t
-  :pin melpa
-  :config
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '((ipython . t))))
+(if (executable-find "jupyter")
+    (use-package ob-ipython
+      :ensure t
+      :pin melpa
+      :config
+      (org-babel-do-load-languages
+       'org-babel-load-languages
+       '((ipython . t)))))
 #+end_src
 
 ** Tracking TODOs and Agenda
