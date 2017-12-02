@@ -45,12 +45,18 @@ the head of that file.
 Inspired by [[http://www.lunaryorn.com/2015/01/06/my-emacs-configuration-with-use-package.html][this]] post, using =use-package= to ensure packages are
 installed and initialize them lazily.
 
+=use-package= can integrate with =diminish= mode to hide minor modes from
+the command line. =diminish= is [[https://github.com/jwiegley/use-package/commit/2c345ccc0eb4f2f3e26fe186d3f71f2b1b87b922][now]] an optional dependency of
+=use-package=, so we'll go ahead and install it ourselves.
+
 #+begin_src emacs-lisp
 ;; bootstrap `use-package', at the same time ensure we install org mode
 ;; from elpa
-(unless (package-installed-p 'use-package)
+(unless (and (package-installed-p 'use-package)
+             (package-installed-p 'diminish))
   (package-refresh-contents)
   (package-install 'use-package)
+  (package-install 'diminish)
   (package-install-from-archive
    (car (alist-get 'org package-archive-contents))))
 #+end_src
