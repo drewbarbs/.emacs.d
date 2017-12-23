@@ -1226,6 +1226,14 @@ described [[https://stackoverflow.com/a/6912415][here]]): =((c++-mode . ((mode .
 #+begin_src emacs-lisp
 (add-hook 'c-mode-common-hook #'comment-auto-fill)
 #+end_src
+* Haskell Mode
+#+begin_src emacs-lisp
+(use-package haskell-mode
+  :ensure t
+  :mode (("\\.hs\\'" . haskell-mode)
+         ("\\.lhs\\'" . haskell-mode)))
+#+end_src
+
 
 * Misc Modes
 ** Markdown
