@@ -1207,6 +1207,68 @@ described [[https://stackoverflow.com/a/6912415][here]]): =((c++-mode . ((mode .
   (add-to-list 'auto-mode-alist '("\\.frag\\'" . glsl-mode))
   (add-to-list 'auto-mode-alist '("\\.geom\\'" . glsl-mode)))
 #+end_src
+** ERC
+I use ZNC as an IRC bouncer, hosted on a Raspberry Pi that broadcasts
+its hostname using multicast DNS (mDNS). The =erc= function uses
+=open-network-stream=, which does not do well with mDNS names
+(=blah.local=), so I define a wrapper that resolves these hostnames
+using =avahi= before passing arguments along to =erc-tls=. Specify this as
+the =znc-erc-ssl-connector= custom variable.
+#+begin_src emacs-lisp
+(use-package znc :ensure t)
+
+(setq my/avresolve (executable-find "avahi-resolve-host-name"))
+
+(defun my/resolve-mdns-name (host)
+  (unless my/avresolve
+    (error "avahi-resolve-host-name is required"))
+
+  (with-temp-buffer
+    (let* ((stderr-file (make-temp-file "avahi-resolve-stderr"))
+           (ret (call-process my/avresolve
+                              nil (list t stderr-file) nil "-4" host))
+           (stdout (buffer-substring (point-min) (point-max)))
+           (_ (insert-file-contents stderr-file nil nil nil t))
+           (stderr (buffer-substring (point-min) (point-max))))
+      (delete-file stderr-file)
+      (when (or (not (equal 0 ret)) (> (length stderr) 0))
+        (error (format "avahi-resolve failed on hostname \"%s\": %s" host stderr)))
+      (cadr (split-string stdout nil t "\\s-\\+")))))
+
+(require 'cl-lib)
+(cl-defun my/erc-tls-connect-mdns
+    (&rest args &key server &allow-other-keys)
+  (require 'dash)
+  (let* ((ip (my/resolve-mdns-name server))
+         (i (seq-position args ':server))
+         (args (-replace-at (1+ i) ip args)))
+    (apply 'erc-tls args)))
+
+(defun my/clear-erc-status-mode-line ()
+  (interactive)
+  (setq erc-modified-channels-alist '())
+  (erc-modified-channels-display))
+
+(use-package erc
+  :config
+  (setq erc-hide-list '("JOIN" "PART" "QUIT"))
+  (add-hook 'erc-mode-hook (lambda ()
+                             (erc-truncate-mode +1)
+                             (diminish 'projectile-mode))))
+
+(use-package erc-hl-nicks :ensure t)
+#+end_src
+
+*** =erc-status-sidebar=
+A little module I wrote to show channel status in a sidebar
+
+#+begin_src emacs-lisp
+(add-to-list 'load-path (expand-file-name "erc-status-sidebar" init-dir))
+(use-package erc-status-sidebar
+  :commands (erc-status-sidebar-toggle)
+  :bind (:map erc-mode-map ("C-c C-s" . #'erc-status-sidebar-toggle)))
+#+end_src
+
 
 * Misc config
 Turn on =helm-top-poll-mode= so that =helm-top= auto-refreshes.
