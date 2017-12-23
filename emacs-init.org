@@ -1010,6 +1010,12 @@ Log =TODO= state transitions in the =LOGBOOK= property drawer by default.
 #+begin_src emacs-lisp
 (setq org-log-into-drawer t)
 #+end_src
+** =org-pomodoro=
+Trying out =org-pomodoro= mode
+#+begin_src emacs-lisp
+(use-package org-pomodoro :ensure t)
+#+end_src
+
 
 ** Export
 
