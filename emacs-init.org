@@ -618,9 +618,25 @@ I use =recentf-open-files= all the time.
               (string-prefix-p dir file-dir))
             (mapcar 'file-truename (list my/savefile-dir package-user-dir)))))
 
+;; Taken from https://gist.github.com/masutaka/1325654/09b1cc94258f63e251cf74806499ce92225edd26
+;; to avoid extraneous writes to the minibuffer
+(defvar my/recentf-list-prev nil)
+(defun my/setup-recentf-advice ()
+  (defadvice recentf-save-list
+      (around no-message activate)
+    "If `recentf-list' and previous recentf-list are equal,
+do nothing. And suppress the output from `message' and
+`write-file' to minibuffer (still shows up in *Messages* buffer)."
+    (unless (equal recentf-list my/recentf-list-prev)
+      (let ((inhibit-message t))
+        ad-do-it
+        (setq my/recentf-list-prev recentf-list)))))
+
 (use-package recentf
   :bind ("C-x C-r" . helm-recentf)
   :config
+  (my/setup-recentf-advice)
+
   (setq recentf-save-file (expand-file-name "recentf" my/savefile-dir)
         recentf-max-saved-items 500
         recentf-max-menu-items 15
@@ -628,8 +644,9 @@ I use =recentf-open-files= all the time.
         ;; problems with remote files
         recentf-auto-cleanup 'never)
   (add-to-list 'recentf-exclude 'prelude-recentf-exclude-p)
+  (add-to-list 'recentf-exclude "/recentf\\'")
   (recentf-mode +1)
-  (run-at-time nil (* 5 60) 'recentf-save-list))
+  (run-at-time nil 10 'recentf-save-list))
 #+end_src
 
 **** Save place in file
