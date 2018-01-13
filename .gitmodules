@@ -7,6 +7,3 @@
 [submodule "ox-pelican-subtree"]
 	path = ox-pelican-subtree
 	url = git@github.com:drewbarbs/ox-pelican-subtree.git
-[submodule "erc-status-sidebar"]
-	path = erc-status-sidebar
-	url = ./erc-status-sidebar

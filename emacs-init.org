@@ -1307,8 +1307,8 @@ the =znc-erc-ssl-connector= custom variable.
 A little module I wrote to show channel status in a sidebar
 
 #+begin_src emacs-lisp
-(add-to-list 'load-path (expand-file-name "erc-status-sidebar" init-dir))
 (use-package erc-status-sidebar
+  :ensure t
   :commands (erc-status-sidebar-toggle)
   :bind (:map erc-mode-map ("C-c C-s" . #'erc-status-sidebar-toggle)))
 #+end_src
