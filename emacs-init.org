@@ -808,7 +808,11 @@ Flyspell config, appropriate from Prelude.
          ("M-p" . org-metaup)
          ("M-n" . org-metadown))
   :config
-  (add-hook 'org-mode-hook #'my/org-set-face))
+  (add-hook 'org-mode-hook #'my/org-set-face)
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((python . t)
+     (sh . t))))
 (use-package org-agenda :bind ("C-c a" . org-agenda))
 (use-package org-capture :bind ([f6] . org-capture))
 #+end_src
@@ -978,14 +982,6 @@ be marked as entending past line length LIMIT."
              '((?B "\\mathbb" "\\textbb" t nil nil))))
 #+end_src
 ** Org Babel
-#+begin_src emacs-lisp
-(setq org-confirm-babel-evaluate nil)
-(eval-after-load 'org
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '((python . t)
-     (shell . t))))
-#+end_src
 *** Personal Library Of Babel
 Load custom functions I would like to be available in all org buffers
 #+begin_src emacs-lisp
