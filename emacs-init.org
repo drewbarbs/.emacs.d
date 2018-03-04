@@ -1021,7 +1021,13 @@ Log =TODO= state transitions in the =LOGBOOK= property drawer by default.
 ** =org-pomodoro=
 Trying out =org-pomodoro= mode
 #+begin_src emacs-lisp
-(use-package org-pomodoro :ensure t)
+(use-package org-pomodoro
+  :ensure t
+  :init
+  (setq org-pomodoro-audio-player "paplay")
+  (setq org-pomodoro-short-break-sound-args "--volume 40000")
+  (setq org-pomodoro-long-break-sound-args "--volume 40000")
+  (setq org-pomodoro-finished-sound-args "--volume 40000"))
 #+end_src
 
 ** Export
