@@ -3,7 +3,8 @@
 ;; used to load the emacs-init.org script
 (require 'package)
 (setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
-                         ("melpa" . "https://melpa.org/packages/")))
+                         ("melpa" . "https://melpa.org/packages/")
+                         ("org" . "https://orgmode.org/elpa/")))
 ;; This modifies the load path
 (package-initialize)
 
