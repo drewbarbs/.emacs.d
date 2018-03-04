@@ -808,6 +808,12 @@ Flyspell config, appropriate from Prelude.
     (set-face-attribute face nil :inherit 'fixed-pitch))
   (setq org-hide-emphasis-markers t))
 
+(use-package mixed-pitch
+  :ensure t
+  :diminish mixed-pitch-mode
+  :config
+  (add-hook 'org-mode-hook #'mixed-pitch-mode))
+
 (use-package org
   :pin org
   :ensure t
