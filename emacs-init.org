@@ -398,21 +398,18 @@ restore the original when leaving."
 (add-hook 'buffer-face-mode-hook #'my/variable-pitch-hook-set-cursor)
 #+end_src
 
+#+begin_src emacs-lisp
+;; Font size
+(global-set-key (kbd "C-+") 'text-scale-increase)
+(global-set-key (kbd "C--") 'text-scale-decrease)
+(diminish 'text-scale-mode)
+#+end_src
+
 *** Disable Window Chrome
 #+begin_src emacs-lisp
 (menu-bar-mode -1)
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
-#+end_src
-
-*** Disambiguate buffers with the same name
-#+begin_src emacs-lisp
-(use-package uniquify
-  :config
-  (setq uniquify-buffer-name-style 'forward)
-  (setq uniquify-separator "/")
-  (setq uniquify-after-kill-buffer-p t)     ; rename after killing uniquified
-  (setq uniquify-ignore-buffers-re "^\\*")) ; don't muck with special buffers
 #+end_src
 
 *** Make =point= easier to find
@@ -447,6 +444,16 @@ another window
 Type out the full strings "yes" and "no"? Ain't nobody got time for that.
 #+begin_src emacs-lisp
 (fset 'yes-or-no-p 'y-or-n-p)
+#+end_src
+
+*** Disambiguate buffers with the same name
+#+begin_src emacs-lisp
+(use-package uniquify
+  :config
+  (setq uniquify-buffer-name-style 'forward)
+  (setq uniquify-separator "/")
+  (setq uniquify-after-kill-buffer-p t)     ; rename after killing uniquified
+  (setq uniquify-ignore-buffers-re "^\\*")) ; don't muck with special buffers
 #+end_src
 
 *** Undo tree
@@ -674,15 +681,6 @@ in the minibuffer, which persists across runs of emacs.
         savehist-autosave-interval 60
         savehist-file (expand-file-name "savehist" my/savefile-dir))
   (savehist-mode +1))
-#+end_src
-
-*** Font-size
-
-#+begin_src emacs-lisp
-;; Font size
-(global-set-key (kbd "C-+") 'text-scale-increase)
-(global-set-key (kbd "C--") 'text-scale-decrease)
-(diminish 'text-scale-mode)
 #+end_src
 
 *** =projectile=
@@ -1000,7 +998,6 @@ From [[https://github.com/gregsexton/ob-ipython][here]].
        'org-babel-load-languages
        '((ipython . t)))))
 #+end_src
-
 ** Tracking TODOs and Agenda
 Log =TODO= state transitions in the =LOGBOOK= property drawer by default.
 #+begin_src emacs-lisp
@@ -1011,7 +1008,6 @@ Trying out =org-pomodoro= mode
 #+begin_src emacs-lisp
 (use-package org-pomodoro :ensure t)
 #+end_src
-
 
 ** Export
 
@@ -1060,7 +1056,6 @@ holding contextual information."
    quote-block (format "\\begin{quote}\n``%s''\\end{quote}" contents) info))
 #+end_src
 
-
 ** Open URLs in Firefox
 #+begin_src emacs-lisp
 (setq org-file-apps
@@ -1070,7 +1065,6 @@ holding contextual information."
       ("\\.x?html?\\'" . "firefox %s")
       ("\\.pdf\\'" . default))))
 #+end_src
-
 * Blog
 A setup for authoring blog posts using org mode, taken from [[http://endlessparentheses.com/how-i-blog-one-year-of-posts-in-a-single-org-file.html][Endless Parentheses]].
 #+begin_src emacs-lisp
@@ -1230,7 +1224,6 @@ described [[https://stackoverflow.com/a/6912415][here]]): =((c++-mode . ((mode .
          ("\\.lhs\\'" . haskell-mode)))
 #+end_src
 
-
 * Misc Modes
 ** Markdown
 #+srcname: name
@@ -1308,7 +1301,6 @@ A little module I wrote to show channel status in a sidebar
   :commands (erc-status-sidebar-toggle)
   :bind (:map erc-mode-map ("C-c C-s" . #'erc-status-sidebar-toggle)))
 #+end_src
-
 
 * Misc config
 Turn on =helm-top-poll-mode= so that =helm-top= auto-refreshes.
