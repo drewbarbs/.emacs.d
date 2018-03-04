@@ -1261,6 +1261,11 @@ described [[https://stackoverflow.com/a/6912415][here]]): =((c++-mode . ((mode .
   (add-to-list 'auto-mode-alist '("\\.frag\\'" . glsl-mode))
   (add-to-list 'auto-mode-alist '("\\.geom\\'" . glsl-mode)))
 #+end_src
+** =yaml-mode=
+#+begin_src emacs-lisp
+(use-package yaml-mode :ensure t :mode "\\.yaml")
+#+end_src
+
 ** ERC
 I use ZNC as an IRC bouncer, hosted on a Raspberry Pi that broadcasts
 its hostname using multicast DNS (mDNS). The =erc= function uses
