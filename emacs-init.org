@@ -1086,6 +1086,24 @@ holding contextual information."
       ("\\.x?html?\\'" . "firefox %s")
       ("\\.pdf\\'" . default))))
 #+end_src
+** PDF Tools
+Learned about using pdf-tools from [[https://www.youtube.com/watch?v=LFO2UbzbZhA][this]] YT video.
+#+begin_src emacs-lisp
+(use-package pdf-tools
+  :ensure t
+  :config
+  ;; attempt to install without prompting, but don't try to install
+  ;; system package dependencies
+  (pdf-tools-install t t))
+
+;; Setup pdfview:: link scheme in org mode
+(use-package org-pdfview :ensure t)
+(eval-after-load 'org '(require 'org-pdfview))
+;; Per org-pdfview suggestion, configure org-mode default to open pdfs
+;; with pdfview
+(add-to-list 'org-file-apps
+             '("\\.pdf\\'" . (lambda (file link) (org-pdfview-open link))))
+#+end_src
 * Blog
 A setup for authoring blog posts using org mode, taken from [[http://endlessparentheses.com/how-i-blog-one-year-of-posts-in-a-single-org-file.html][Endless Parentheses]].
 #+begin_src emacs-lisp
