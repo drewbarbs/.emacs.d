@@ -1105,15 +1105,6 @@ Learned about using pdf-tools from [[https://www.youtube.com/watch?v=LFO2UbzbZhA
 (add-to-list 'org-file-apps
              '("\\.pdf\\'" . (lambda (file link) (org-pdfview-open link))))
 #+end_src
-* Blog
-A setup for authoring blog posts using org mode, taken from [[http://endlessparentheses.com/how-i-blog-one-year-of-posts-in-a-single-org-file.html][Endless Parentheses]].
-#+begin_src emacs-lisp
-(defvar endless/blog-base-url "http://dbarbs.net/")
-(defvar endless/blog-dir nil)
-
-(add-to-list 'load-path (expand-file-name "ox-pelican-subtree" init-dir))
-(require 'ox-pelican-subtree)
-#+end_src
 
 * C/C++ Modes
 ** Editing
