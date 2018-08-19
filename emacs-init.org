@@ -492,7 +492,9 @@ expected.
 (setq sentence-end-double-space nil)
 #+end_src
 
-*** Prefer vertical splits
+*** Window Management
+Referring to /emacs/ windows, not /window manager/ windows (a.k.a. emacs "frames")
+**** Prefer vertical splits
 From [[http://stackoverflow.com/a/25587333/756104][this]] stack overflow answer, opens a new window with a vertical
 split if there's sufficient room available, otherwise uses a
 horizontal split.
@@ -500,8 +502,7 @@ horizontal split.
 (setq split-height-threshold nil)
 (setq split-width-threshold 200)
 #+end_src
-
-*** Transpose Windows
+**** Transpose Windows
 Bind =C-c y= to transpose windows (a vertical split becomes a
 horizontal one and vice versa). =C-c f= will swap buffers across $y$
 axis, =C-c F= will swap buffers across $x$ axis.
@@ -513,7 +514,17 @@ axis, =C-c F= will swap buffers across $x$ axis.
          ("C-c F" . flip-frame)))
 #+end_src
 
+**** Toggle window dedicated
+Useful to get a window (like a help window) to not be taken over by
+other commands that open windows
+#+begin_src emacs-lisp
+(defun my/toggle-window-dedicated ()
+  (interactive)
+  (let ((cur-window (frame-selected-window)))
+    (set-window-dedicated-p cur-window (not (window-dedicated-p cur-window)))))
 
+(global-set-key (kbd "C-c d") #'my/toggle-window-dedicated)
+#+end_src
 *** Backups/Persistence
 Pretty much all this stuff is copied verbatim from Prelude. It gets
 the =backup~= files out of the way, remembers where you last left in a
