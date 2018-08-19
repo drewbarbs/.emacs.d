@@ -807,38 +807,28 @@ Flyspell config, appropriate from Prelude.
 * Org Mode
 ** Global Bindings
 #+begin_src emacs-lisp
-(defun my/org-set-face ()
-  (variable-pitch-mode +1)
-  (diminish 'buffer-face-mode)
-  (dolist (face '(org-block-begin-line
-                  org-block-end-line
-                  org-verbatim
-                  org-code
-                  org-block
-                  font-lock-keyword-face))
-    (set-face-attribute face nil :inherit 'fixed-pitch))
-  (setq org-hide-emphasis-markers t))
+  (use-package org-variable-pitch
+    :diminish org-variable-pitch-minor-mode
+    :config
+    (defun my/org-init ()
+      (org-variable-pitch-minor-mode +1)
+      (diminish 'buffer-face-mode)
+      (setq org-hide-emphasis-markers t))
+    (add-hook 'org-mode-hook #'my/org-init))
 
-(use-package mixed-pitch
-  :ensure t
-  :diminish mixed-pitch-mode
-  :config
-  (add-hook 'org-mode-hook #'mixed-pitch-mode))
-
-(use-package org
-  :pin org
-  :ensure t
-  :bind (("C-c l" . org-store-link)
-         ("M-p" . org-metaup)
-         ("M-n" . org-metadown))
-  :config
-  (add-hook 'org-mode-hook #'my/org-set-face)
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '((python . t)
-     (sh . t))))
-(use-package org-agenda :bind ("C-c a" . org-agenda))
-(use-package org-capture :bind ([f6] . org-capture))
+  (use-package org
+    :pin org
+    :ensure t
+    :bind (("C-c l" . org-store-link)
+           ("M-p" . org-metaup)
+           ("M-n" . org-metadown))
+    :config
+    (org-babel-do-load-languages
+     'org-babel-load-languages
+     '((python . t)
+       (sh . t))))
+  (use-package org-agenda :bind ("C-c a" . org-agenda))
+  (use-package org-capture :bind ([f6] . org-capture))
 #+end_src
 *** Org-Ref
 A very cool/helpful package to manage citations in org file/take notes
