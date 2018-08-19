@@ -722,6 +722,11 @@ in the minibuffer, which persists across runs of emacs.
   (google-this-mode 1))
 #+end_src
 
+*** =dired-x=
+#+begin_src emacs-lisp
+(use-package dired-x
+  :bind ("C-x C-j" . dired-jump))
+#+end_src
 ** Snippets
 Fetch yasnippet, add the =other-snippets= directory to the path (where
 I pull in additional snippets via git submodules).
