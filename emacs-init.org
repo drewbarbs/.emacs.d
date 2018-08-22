@@ -700,10 +700,7 @@ in the minibuffer, which persists across runs of emacs.
   :ensure t
   :config
   (projectile-global-mode)
-  ;; workaround for https://github.com/bbatsov/projectile/issues/1183
-  (setq projectile-mode-line
-        '(:eval (format " Projectile[%s]"
-                        (projectile-project-name)))))
+  (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map))
 #+end_src
 
 #+begin_src emacs-lisp
