@@ -711,6 +711,8 @@ in the minibuffer, which persists across runs of emacs.
 #+end_src
 
 *** =google-this=
+=google-this=, bound to =C-c / t=. It also comes with a function to google
+cppreference (=C-c / r=).
 #+begin_src emacs-lisp
 (use-package google-this
   :ensure t
