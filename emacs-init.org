@@ -1034,6 +1034,27 @@ Log =TODO= state transitions in the =LOGBOOK= property drawer by default.
 #+begin_src emacs-lisp
 (setq org-log-into-drawer t)
 #+end_src
+*** Marking tasks done some time in the past
+Sometimes I forget to mark a repeating task done the day I do it, so
+when I mark them done the =LAST_REPEAT= and next scheduled time are
+automatically entered as being relative to a later day than they
+should. This function prompts for a date, and marks the task as done
+on that day
+
+#+begin_src emacs-lisp
+(defmacro with-curtime (curtime &rest body)
+  `(cl-letf (((symbol-function 'current-time) (lambda () ,curtime)))
+     (progn ,@body)))
+
+(defun mark-done-on-day ()
+  (interactive)
+  (let ((curtime (org-read-date t t)))
+    ;; (org-read-date) seems to only return high/low seconds, not usec/psec
+    ;; as is also returned by (current-time)
+    (if (eq 2 (length curtime))
+        (setq curtime `(,@curtime 0 0)))
+    (with-curtime curtime (org-todo 'done))))
+#+end_src
 ** =org-pomodoro=
 Trying out =org-pomodoro= mode
 #+begin_src emacs-lisp
