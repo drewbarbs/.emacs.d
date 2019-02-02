@@ -14,6 +14,17 @@ to their fullest extent:
   indexed a project)
 - =clang-format=
 - Python + IPython >= 5 + Jupyter >= 1.0 for [[https://github.com/gregsexton/ob-ipython][ob-ipython]]
+- =elpy= dependencies:
+  - =rope=
+  - =jedi=
+  - =flake8=
+  - =autopep8=
+  - =yapf=
+
+  Arch install command:
+  #+begin_src sh
+sudo pacman -S python-rope python-jedi flake8 autopep8 yapf
+  #+end_src
 
 * Personal
 #+begin_src emacs-lisp
@@ -1257,6 +1268,15 @@ described [[https://stackoverflow.com/a/6912415][here]]): =((c++-mode . ((mode .
   :ensure t
   :mode (("\\.hs\\'" . haskell-mode)
          ("\\.lhs\\'" . haskell-mode)))
+#+end_src
+
+* Python Mode
+After installing the [[* Dependencies][dependencies]], we can use =Elpy=
+#+begin_src emacs-lisp
+(use-package elpy
+  :ensure t
+  :config
+  (elpy-enable))
 #+end_src
 
 * Misc Modes
