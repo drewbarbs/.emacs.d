@@ -1321,6 +1321,14 @@ After installing the [[* Dependencies][dependencies]], we can use =Elpy=
 (use-package yaml-mode :ensure t :mode "\\.yaml")
 #+end_src
 
+** =re-builder=
+Set the default =re-builder= syntax to =string= so I can save 1 billion
+press/release cycles on my backslash key
+
+#+begin_src emacs-lisp
+(setq reb-re-syntax 'string)
+#+end_src
+
 ** ERC
 I use ZNC as an IRC bouncer, hosted on a Raspberry Pi that broadcasts
 its hostname using multicast DNS (mDNS). The =erc= function uses
