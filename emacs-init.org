@@ -838,7 +838,7 @@ Flyspell config, appropriate from Prelude.
     (org-babel-do-load-languages
      'org-babel-load-languages
      '((python . t)
-       (sh . t))))
+       (shell . t))))
   (use-package org-agenda :bind ("C-c a" . org-agenda))
   (use-package org-capture :bind ([f6] . org-capture))
 #+end_src
