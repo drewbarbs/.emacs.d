@@ -1397,7 +1397,6 @@ A little module I wrote to show channel status in a sidebar
 (add-to-list 'display-buffer-alist
              '(my/erc-window-reuse-condition .
                (display-buffer-reuse-mode-window
-                (inhibit-same-window . t)
                 (inhibit-switch-frame . t)
                 (mode . erc-mode))))
 #+end_src
