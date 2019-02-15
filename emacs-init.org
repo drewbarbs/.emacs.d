@@ -1040,7 +1040,12 @@ on that day
 
 #+begin_src emacs-lisp
 (defmacro with-curtime (curtime &rest body)
-  `(cl-letf (((symbol-function 'current-time) (lambda () ,curtime)))
+  `(cl-letf* (((symbol-function 'current-time) (lambda () ,curtime))
+              ((symbol-function 'fts) (symbol-function 'format-time-string))
+              ((symbol-function 'org-today) (lambda () (time-to-days ,curtime)))
+              ((symbol-function 'format-time-string)
+               (lambda (fmt &optional tm z)
+                 (apply 'fts (list fmt (or tm ,curtime) z)))))
      (progn ,@body)))
 
 (defun mark-done-on-day ()
