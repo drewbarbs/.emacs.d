@@ -1331,6 +1331,11 @@ press/release cycles on my backslash key
 (setq reb-re-syntax 'string)
 #+end_src
 
+** Docker
+#+begin_src emacs-lisp
+(use-package dockerfile-mode :ensure t)
+#+end_src
+
 ** ERC
 I use ZNC as an IRC bouncer, hosted on a Raspberry Pi that broadcasts
 its hostname using multicast DNS (mDNS). The =erc= function uses
