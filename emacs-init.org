@@ -1032,7 +1032,14 @@ Load custom functions I would like to be available in all org buffers
 #+end_src
 
 *** =ob-ipython=
-From [[https://github.com/gregsexton/ob-ipython][here]].
+[[https://github.com/gregsexton/ob-ipython][Docs]]. Might consider switching to [[https://www.youtube.com/watch?v=dMira3QsUdg][scimax]] if I used it more
+extensively.
+
+To use =ob-ipython= use need =:session= argument to header of all src
+blocks, also the src type is =ipython=. You can use =M-x
+ob-ipython-inspect= to get documentation for the thing at point (in a
+src block). You can also oepn a REPL connected to the current kernel
+by running =C-c C-v C-z=.
 #+begin_src emacs-lisp
 (if (executable-find "jupyter")
     (use-package ob-ipython
