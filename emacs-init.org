@@ -844,6 +844,19 @@ Flyspell config, appropriate from Prelude.
 A very cool/helpful package to manage citations in org file/take notes
 for citations.
 
+Workflow:
+1. Create a =notes.org= file on a topic
+2. Put this somewhere in the file: =bibliography:refs.bib=
+3. Add a paper's bibtex to =refs.bib=
+4. In =notes.org=, add a citation to the paper with =C-c ]=
+5. Call =org-open-at-point= on the citation (=C-c C-o=)
+6. Select =Add notes=
+
+Don't have a good method for finding an entry yet. /Could/
+1. Use =C-c ]= to create a citation, using helm to search bibtex entries
+2. Open the new =cite= link (click or =C-c C-o=) and use the =Open bibtex= entry
+3. At the =bibtex= entry, use =org-ref-open-bibtex-notes=
+
 #+begin_src emacs-lisp
 (defun my/org-ref-bibliography-format (orig-format keyword desc format)
   (cond
