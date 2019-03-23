@@ -594,27 +594,25 @@ To "helm" a command, use the =helm-command-prefix-key=: =C-x c=. E.g.
               (define-key eshell-mode-map (kbd "M-r") #'helm-eshell-history))))
 #+end_src
 
-Add =helm-swoop=, which is like a souped-up =occur=. It moves the
-cursor in the original buffer around with the selected swoop match,
-can show a configurable number of context lines (prefix argument),
-can search across multiple buffers, etc.
-
-While searching with =isearch=, you can launch =helm-swoop= with the
-current search term by pressing =M-i=.
-
-#+begin_src emacs-lisp
-(use-package helm-swoop
-  :ensure t
-  :bind (("M-i" . helm-swoop)
-         ("M-I" . helm-swoop-back-to-last-point)
-         ("C-c M-i" . helm-swoop)
-         ("C-x M-i" . helm-multi-swoop-all)))
-#+end_src
-
 **** Find
 Use =helm-find= to accomplish =find . | grep=-like functionality. In
 =helm-find-files= (=C-x C-f=), type =C-c /= to recursively find files
 in the selected directory with names containing the given pattern.
+
+*** =ace-window=
+Press =M-o= and each window in the frame will have a label you can press
+to quickly jump to it. As a special case, if there are only two
+windows in the frame, =M-o= causes the focus to immediately switch to
+the other window.
+
+#+begin_src emacs-lisp
+(use-package ace-window
+  :ensure t
+  :config
+  (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l)
+        aw-scope 'frame)
+  :bind (("M-o" . ace-window)))
+#+end_src
 
 *** Jump to char with =avy=
 Use =avy=, based on =ace-jump-mode= and =vim-easymotion=.
