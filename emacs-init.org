@@ -348,6 +348,12 @@ act on the whole buffer if called without an active region.
   (add-hook 'after-init-hook #'global-flycheck-mode))
 #+end_src
 
+*** Enable commands
+
+#+begin_src emacs-lisp
+(put 'narrow-to-region 'disabled nil)
+#+end_src
+
 ** Appearance
 
 *** Theme
