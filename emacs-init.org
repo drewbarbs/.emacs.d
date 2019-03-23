@@ -1329,6 +1329,12 @@ press/release cycles on my backslash key
 (setq reb-re-syntax 'string)
 #+end_src
 
+** =nasm-mode=
+#+begin_src emacs-lisp
+(use-package nasm-mode
+  :ensure t
+  :mode "\\.nasm\\'")
+#+end_src
 ** Docker
 #+begin_src emacs-lisp
 (use-package dockerfile-mode :ensure t)
