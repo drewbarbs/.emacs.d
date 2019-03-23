@@ -1289,6 +1289,17 @@ described [[https://stackoverflow.com/a/6912415][here]]): =((c++-mode . ((mode .
   :ensure t
   :mode (("\\.hs\\'" . haskell-mode)
          ("\\.lhs\\'" . haskell-mode)))
+
+(defun my/config-haskell-buf ()
+  (interactive-haskell-mode +1)
+  (hindent-mode +1)
+  (add-hook 'before-save-hook #'hindent-reformat-buffer))
+
+(use-package hindent
+  :ensure t
+  :diminish hindent-mode
+  :config
+  (add-hook 'haskell-mode-hook #'my/config-haskell-buf))
 #+end_src
 
 * Python Mode
