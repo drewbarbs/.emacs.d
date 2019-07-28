@@ -928,11 +928,11 @@ the /description text/ of org mode links counts against the
 (defun my/advance-to-col (startpos startcol stopcol)
   "Given a start position STARTPOS in the current buffer, the column count
 at point STARTPOS (STARTCOL) and desired end column (STOPCOL), return the
-position of character starting column (STOPCOL+1)"
+buffer position of character starting column (STOPCOL)"
   (let ((curpos startpos)
-        (curcols startcol))
-    (while (<= curcols stopcol)
-      (setq curcols (+ curcols (char-width (char-after curpos))))
+        (curcol startcol))
+    (while (< curcol stopcol)
+      (setq curcol (+ curcol (char-width (char-after curpos))))
       (setq curpos (1+ curpos)))
     curpos))
 
@@ -969,8 +969,9 @@ be marked as entending past line length LIMIT."
             (setq curcols (+ mstartcol labelwidth)))
           (setq curpos (point)))
         ;; no org link match, see if line is just a long one
-        (let ((advancecols (string-width (buffer-substring (point) (line-end-position)))))
-          (when (>= (+ curcols advancecols) whitespace-line-column)
+        (let* ((advancecols (string-width (buffer-substring (point) (line-end-position))))
+               (excess-start (+ curcols advancecols)))
+          (when (> excess-start whitespace-line-column)
             (throw 'done (list (my/advance-to-col curpos curcols whitespace-line-column) lim)))))
       (if (< (1+ (line-end-position)) (point-max))
           (forward-line)
