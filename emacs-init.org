@@ -440,6 +440,14 @@ another window
   :config (beacon-mode +1))
 #+end_src
 
+*** "Night mode"
+#+begin_src emacs-lisp
+(defun nighttime ()
+  (interactive)
+  (disable-theme 'leuven)
+  (load-theme 'monokai)
+  (powerline-reset))
+#+end_src
 ** Behavior
 *** Ask for confirmation before quitting
 #+begin_src emacs-lisp
