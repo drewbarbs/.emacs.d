@@ -824,8 +824,6 @@ Flyspell config, appropriate from Prelude.
 #+begin_src emacs-lisp
 (add-hook 'eshell-mode-hook
           (lambda ()
-            (add-to-list 'eshell-visual-commands "pacman")
-            (add-to-list 'eshell-visual-commands "pacaur")
             (add-to-list 'eshell-visual-subcommands '("git" "log" "diff" "show"))))
 #+end_src
 * Org Mode
