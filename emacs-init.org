@@ -956,13 +956,13 @@ be marked as entending past line length LIMIT."
                 (setq labelwidth (string-width (match-string 5))
                       labelstart (match-beginning 5))
               ;; link of the form [[proto:something]]
-              (setq labelwidth (string-width (concat (match-string 1) (match-string 3)))
-                    labelstart (match-beginning 1)))
-            (when (>= mstartcol whitespace-line-column)
+              (setq labelwidth (string-width (match-string 3))
+                    labelstart (match-beginning 3)))
+            (when (> mstartcol whitespace-line-column)
               ;; link starts after whitespace-line-column, wholesale mark everything
               ;; after whitespace-line-column
               (throw 'done (list (my/advance-to-col curpos curcols whitespace-line-column) lim)))
-            (when (>= (+ mstartcol labelwidth) whitespace-line-column)
+            (when (> (+ mstartcol labelwidth) whitespace-line-column)
               ;; link starts before whitespace-line-column, but description (visible part)
               ;; extends past it
               (throw 'done (list (my/advance-to-col labelstart mstartcol whitespace-line-column) lim)))
@@ -995,8 +995,8 @@ be marked as entending past line length LIMIT."
     (font-lock-remove-keywords nil my/org-bline-minor-mode-font-lock-keywords))
   (font-lock-mode 1))
 
-(defun my/org-bline-minor-mode--insin ()
-  (add-hook 'after-change-functions 'my/org-bline-minor-mode--uate nil t)
+(defun my/org-bline-minor-mode--init ()
+  (add-hook 'after-change-functions 'my/org-bline-minor-mode--fini nil t)
   ;; for debugging purposes, disable the JIT
   ;; (setq font-lock-support-mode nil)
   ;; (font-lock-mode -1)
@@ -1009,11 +1009,11 @@ be marked as entending past line length LIMIT."
        (remove 'lines-tail whitespace-style))
   (whitespace-mode +1))
 
-(defun my/org-bline-minor-mode--uate (&rest ignore)
+(defun my/org-bline-minor-mode--fini (&rest ignore)
   (my/org-bline-minor-mode 1)
-  (remove-hook 'after-change-functions 'my/org-bline-minor-mode--uate t))
+  (remove-hook 'after-change-functions 'my/org-bline-minor-mode--fini t))
 
-(add-hook 'org-mode-hook 'my/org-bline-minor-mode--insin)
+(add-hook 'org-mode-hook 'my/org-bline-minor-mode--init)
 #+end_src
 *** =cdlatex= mode
 #+begin_src emacs-lisp
