@@ -783,7 +783,26 @@ I pull in additional snippets via git submodules).
   (add-hook 'dired-mode-hook 'diff-hl-dired-mode)
   (add-hook 'magit-post-refresh-hook #'diff-hl-magit-post-refresh))
 #+end_src
+*** Jump to dired buffer in eshell
+#+begin_src emacs-lisp
+(defun my/dired-open-in-eshell ()
+  (interactive)
+  (let ((cwd default-directory))
+    (call-interactively #'eshell)
+    (eshell/cd cwd)
+    ;; if eshell buffer is already open, then the prompt doesn't seem
+    ;; to be updating. E.g. if eshell was at "~ $" and we use this
+    ;; function to cd to /some/dir, the prompt stays at "~ $". We can
+    ;; force an update (on a new line) by sending an empty line input
+    ;; to the shell. Make sure we clear any input that might already
+    ;; by in eshell buffer so we don't execute unexpected commands.
+    (eshell-kill-input)
+    (eshell-send-input)))
 
+(use-package dired
+  :bind (:map dired-mode-map
+              ("E" . my/dired-open-in-eshell)))
+#+end_src
 *** Expand outline when diffing
 Useful for diffing org mode
 #+begin_src emacs-lisp
