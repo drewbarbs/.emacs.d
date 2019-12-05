@@ -382,9 +382,9 @@ Leuven theme doesn't make overdue agenda items sufficiently prominent
 #+end_src
 
 *** Font
-Set font size to 12 point (height value is in 1/10 pt)
+Set font size to 13 point (height value is in 1/10 pt)
 #+begin_src emacs-lisp
-(set-face-attribute 'default nil :height 120)
+(set-face-attribute 'default nil :height 130)
 (defun my/have-font (font)
   (member font (font-family-list)))
 
@@ -398,7 +398,7 @@ Set font size to 12 point (height value is in 1/10 pt)
     ;; set the variable-pitch face to use font we found
     (eval `(set-face-attribute 'variable-pitch nil ,@ft)))
   (when (my/have-font "Source Code Pro")
-    (set-face-attribute 'default nil :font "Source Code Pro" :height 120)))
+    (set-face-attribute 'default nil :font "Source Code Pro" :height 130)))
 (add-hook 'after-make-frame-functions #'my/setup-fonts)
 (my/setup-fonts nil)
 
