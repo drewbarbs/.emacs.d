@@ -606,7 +606,8 @@ To "helm" a command, use the =helm-command-prefix-key=: =C-x c=. E.g.
   :config
   (add-hook 'eshell-mode-hook
             (lambda ()
-              (define-key eshell-mode-map (kbd "M-r") #'helm-eshell-history))))
+              (define-key eshell-mode-map (kbd "M-r") #'helm-eshell-history)))
+  (setq helm-M-x-reverse-history t))
 #+end_src
 
 **** Find
