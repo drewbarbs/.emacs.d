@@ -1454,6 +1454,11 @@ the =znc-erc-ssl-connector= custom variable.
                              (diminish 'projectile-mode))))
 
 (use-package erc-hl-nicks :ensure t)
+;; ignore IRC buffers in helm buffer list (or any buffer that starts with '#'...)
+(add-to-list 'helm-boring-buffer-regexp-list "\\`#")
+(add-to-list 'helm-boring-buffer-regexp-list "\\`\\*ERC Status\\*\\'")
+(dolist (network '("Freenode" "SFML" "Twitch"))
+         (add-to-list 'helm-boring-buffer-regexp-list (format "\\`\\*irc-%s\\*\\'" network)))
 #+end_src
 
 *** =erc-status-sidebar=
