@@ -390,7 +390,8 @@ Set font size to 13 point (height value is in 1/10 pt)
 
 (defun my/setup-fonts (frame)
   (when frame
-    (select-frame frame))
+    (select-frame frame)
+    (remove-hook 'after-make-frame-functions #'my/setup-fonts))
   (let ((ft
          (cond ((my/have-font "Source Sans Pro") '(:font "Source Sans Pro"))
                ((my/have-font "Lucida Grande") '(:font "Lucida Grande"))
