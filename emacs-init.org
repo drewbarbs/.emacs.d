@@ -1345,7 +1345,7 @@ described [[https://stackoverflow.com/a/6912415][here]]): =((c++-mode . ((mode .
 (defun my/config-haskell-buf ()
   (interactive-haskell-mode +1)
   (hindent-mode +1)
-  (add-hook 'before-save-hook #'hindent-reformat-buffer t))
+  (add-hook 'before-save-hook #'hindent-reformat-buffer t t))
 
 (use-package hindent
   :ensure t
