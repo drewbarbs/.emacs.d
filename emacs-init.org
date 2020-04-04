@@ -9,9 +9,6 @@ The packages configured by this file require the following to be used
 to their fullest extent:
 - Emacs >= 24.5 (for magit)
 - Git >= 1.9.4 (for magit)
-- rtags (used by cmake-ide)
-- GNU Global >= (for gtags, used as a fallback if rtags hasn't
-  indexed a project)
 - =clang-format=
 - Python + IPython >= 5 + Jupyter >= 1.0 for [[https://github.com/gregsexton/ob-ipython][ob-ipython]]
 - =elpy= dependencies:
@@ -98,7 +95,6 @@ Show =*scratch*= buffer on startup, rather than splash screen.
 #+end_src
 
 * Global
-
 ** Editing
 Universal editing configuration: how to handle whitespace, etc.
 Largely lifted from =prelude-editor.el=.
@@ -248,7 +244,6 @@ Show a documentation popup for company completion candidates
   (company-quickhelp-mode 1))
 #+end_src
 
-
 **** =hippie-expand=
 Setup =hippie-expand=, which completes the word before point using one
 of a variety of sources. Another bit of config taken verbatim from
@@ -347,7 +342,45 @@ act on the whole buffer if called without an active region.
   :config
   (add-hook 'after-init-hook #'global-flycheck-mode))
 #+end_src
+*** =lsp-mode=
+Referenced [[https://www.mortens.dev/blog/emacs-and-the-language-server-protocol/][this]] guide while setting it up.
 
+#+begin_src emacs-lisp
+;; setting lsp-keymap-prefix per https://github.com/emacs-lsp/lsp-mode/issues/1532#issuecomment-602384182
+(use-package which-key :ensure t)
+
+(use-package lsp-mode
+  :ensure t
+  :hook ((c++-mode . lsp)
+         (lsp-mode . (lambda ()
+                       (let ((lsp-keymap-prefix "C-c l"))
+                         (lsp-enable-which-key-integration)))))
+  :config
+  (define-key lsp-mode-map (kbd "C-c l") lsp-command-map)
+  (setq lsp-keymap-prefix "C-c l") ; the default "s-l" is taken by my WM
+  (setq lsp-prefer-flymake nil)
+  (setq lsp-clients-clangd-args '("-j=4" "-background-index" "-log=error"))
+  (add-hook 'lsp-ui-mode-hook  #'my/turn-off-annoying-lsp-ui t))
+
+(defun my/turn-off-annoying-lsp-ui ()
+  (lsp-ui-doc-mode -1)
+  (lsp-ui-sideline-mode -1))
+
+(use-package lsp-ui
+  :ensure t
+  :requires lsp-mode flycheck
+  :config
+  (setq lsp-ui-flycheck-enable t))
+
+(use-package company-lsp
+  :ensure t
+  :requires company
+  :config
+  (push 'company-lsp company-backends)
+
+  (setq company-lsp-async t
+        company-lsp-cache-candidates nil))
+#+end_src
 *** Enable commands
 
 #+begin_src emacs-lisp
@@ -1052,6 +1085,12 @@ be marked as entending past line length LIMIT."
   (setq cdlatex-math-modify-alist
              '((?B "\\mathbb" "\\textbb" t nil nil))))
 #+end_src
+** Appearance
+The following allows you to specify =#+ATTR_ORG: :width 400= on an image
+so that inline image previews can be resized
+#+begin_src emacs-lisp
+(setq org-image-actual-width nil)
+#+end_src
 ** Org Babel
 *** Personal Library Of Babel
 Load custom functions I would like to be available in all org buffers
@@ -1232,91 +1271,9 @@ definition (thanks to =electric-indent-mode=), etc.
 (add-hook 'c++-mode-hook #'my/turn-on-local-electric-pair)
 #+end_src
 
-*** =gtags= and =rtags=
-Setup both =gtags= and =rtags=, along with some keybindings, where the
-keys will fall back to =gtags= if =GTAGS= files are present /and/
-RTags isn't running/hasn't indexed the project.
-
-Note, if in a file where neither =GTAGS= exists, nor RTags is running,
-then running, e.g. =M-.= will print the message "Can't seem to connect
-to server. Is rdm running?"
-
-#+begin_src emacs-lisp
-(use-package gtags
-  :load-path ("/usr/share/global"
-              "/usr/share/gtags"
-              "/usr/local/share/global"
-              "/usr/local/share/gtags")
-  :diminish gtags-mode)
-(use-package ggtags
-  :ensure t
-  :diminish ggtags-mode)
-
-(defun use-rtags (&optional useFileManager)
-  (and (executable-find "rc")
-       (cond ((not (gtags-get-rootpath)) t)
-             ((and
-               (not (eq major-mode 'c++-mode))
-               (not (eq major-mode 'c-mode)))
-              (rtags-has-filemanager))
-             (useFileManager (rtags-has-filemanager))
-             (t (and (rtags-is-running) (rtags-is-indexed))))))
-
-(defun tags-pop-tab-mark ()
-  (interactive)
-  (call-interactively (if (use-rtags) 'rtags-location-stack-back 'pop-tag-mark)))
-
-(defun tags-find-symbol-at-point (&optional prefix)
-  (interactive "P")
-  (if (or (not (use-rtags)) (and (not (rtags-find-symbol-at-point prefix)) rtags-last-request-not-indexed))
-      (call-interactively 'ggtags-find-definition)))
-(defun tags-find-references-at-point (&optional prefix)
-  (interactive "P")
-  (if (or (not (use-rtags)) (and (not (rtags-find-references-at-point prefix)) rtags-last-request-not-indexed))
-      (call-interactively 'ggtags-find-reference)))
-(defun tags-find-symbol ()
-  (interactive)
-  (call-interactively (if (use-rtags) 'rtags-find-symbol 'ggtags-find-definition)))
-(defun tags-find-references ()
-  (interactive)
-  (call-interactively (if (use-rtags) 'rtags-find-references 'ggtags-find-reference)))
-(defun tags-find-file ()
-  (interactive)
-  (call-interactively (if (use-rtags t) 'rtags-find-file 'gtags-find-file)))
-(defun tags-imenu ()
-  (interactive)
-  (call-interactively (if (use-rtags t) 'rtags-imenu 'idomenu)))
-
-(use-package rtags
-  :ensure t
-  ;; Need to load rtags eagerly, otherwise the cmake-ide {c,c++}-mode hooks will
-  ;; fail to launch rdm, even if it's not running
-  :demand t
-  :init
-  (setq rtags-completions-enabled t)
-  :bind
-  (:map c-mode-base-map
-   ("M-*" . tags-pop-tab-mark)
-   ("M-." . tags-find-symbol-at-point)
-   ("M-," . tags-find-references-at-point)
-   ("C-." . tags-find-symbol)
-   ("C-," . tags-find-references)
-   ("C-<" . rtags-find-virtuals-at-point)
-   ("M-<left>" . rtags-location-stack-back)
-   ("M-<right>" . rtags-location-stack-forward))
-  :config
-  (set-face-attribute 'rtags-argument-face nil :foreground "#ffffff"))
-#+end_src
 *** =cmake-mode=
 #+begin_src emacs-lisp
 (use-package cmake-mode :ensure t)
-#+end_src
-
-*** =cmake-ide=
-#+begin_src emacs-lisp
-(use-package cmake-ide
-  :ensure t
-  :config (require 'subr-x) (cmake-ide-setup))
 #+end_src
 
 *** Open .h files in C++ mode by default
@@ -1338,7 +1295,11 @@ described [[https://stackoverflow.com/a/6912415][here]]): =((c++-mode . ((mode .
 (use-package haskell-mode
   :ensure t
   :mode (("\\.hs\\'" . haskell-mode)
-         ("\\.lhs\\'" . haskell-mode)))
+         ("\\.lhs\\'" . haskell-mode))
+  :config
+  (add-hook 'haskell-cabal-mode-hook
+            (lambda ()
+              (add-hook 'before-save-hook #'whitespace-cleanup t t))))
 
 (defun my/config-haskell-buf ()
   (interactive-haskell-mode +1)
@@ -1455,7 +1416,7 @@ the =znc-erc-ssl-connector= custom variable.
 ;; ignore IRC buffers in helm buffer list (or any buffer that starts with '#'...)
 (add-to-list 'helm-boring-buffer-regexp-list "\\`#")
 (add-to-list 'helm-boring-buffer-regexp-list "\\`\\*ERC Status\\*\\'")
-(dolist (network '("Freenode" "SFML" "Twitch"))
+(dolist (network '("Freenode" "SFML" "Twitch" "QuakeNet"))
          (add-to-list 'helm-boring-buffer-regexp-list (format "\\`\\*irc-%s\\*\\'" network)))
 #+end_src
 
