@@ -1188,12 +1188,8 @@ Learned about using pdf-tools from [[https://www.youtube.com/watch?v=LFO2UbzbZhA
   (pdf-tools-install t t))
 
 ;; Setup pdfview:: link scheme in org mode
-(use-package org-pdfview :ensure t)
-(eval-after-load 'org '(require 'org-pdfview))
-;; Per org-pdfview suggestion, configure org-mode default to open pdfs
-;; with pdfview
-(add-to-list 'org-file-apps
-             '("\\.pdf\\'" . (lambda (file link) (org-pdfview-open link))))
+(use-package org-pdftools :ensure t
+  :hook (org-load . org-pdftools-setup-link))
 #+end_src
 
 * C/C++ Modes
