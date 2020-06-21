@@ -381,14 +381,20 @@ Referenced [[https://www.mortens.dev/blog/emacs-and-the-language-server-protocol
   (setq company-lsp-async t
         company-lsp-cache-candidates nil))
 #+end_src
+*** Compile keybind
+From https://emacs.stackexchange.com/a/10950
+#+begin_src emacs-lisp
+(global-set-key (kbd "C-c m") 'recompile)
+#+end_src
+
 *** Enable commands
 
 #+begin_src emacs-lisp
 (put 'narrow-to-region 'disabled nil)
+(put 'downcase-region 'disabled nil)
 #+end_src
 
 ** Appearance
-
 *** Theme
 Using leuven, along with powerline
 
@@ -722,7 +728,7 @@ do nothing. And suppress the output from `message' and
   (add-to-list 'recentf-exclude 'prelude-recentf-exclude-p)
   (add-to-list 'recentf-exclude "/recentf\\'")
   (recentf-mode +1)
-  (run-at-time nil 10 'recentf-save-list))
+  (run-at-time nil 10 #'recentf-save-list))
 #+end_src
 
 **** Save place in file
@@ -779,11 +785,6 @@ cppreference (=C-c / r=).
   (google-this-mode 1))
 #+end_src
 
-*** =dired-x=
-#+begin_src emacs-lisp
-(use-package dired-x
-  :bind ("C-x C-j" . dired-jump))
-#+end_src
 ** Snippets
 Fetch yasnippet, add the =other-snippets= directory to the path (where
 I pull in additional snippets via git submodules).
@@ -817,26 +818,6 @@ I pull in additional snippets via git submodules).
   (global-diff-hl-mode +1)
   (add-hook 'dired-mode-hook 'diff-hl-dired-mode)
   (add-hook 'magit-post-refresh-hook #'diff-hl-magit-post-refresh))
-#+end_src
-*** Jump to dired buffer in eshell
-#+begin_src emacs-lisp
-(defun my/dired-open-in-eshell ()
-  (interactive)
-  (let ((cwd default-directory))
-    (call-interactively #'eshell)
-    (eshell/cd cwd)
-    ;; if eshell buffer is already open, then the prompt doesn't seem
-    ;; to be updating. E.g. if eshell was at "~ $" and we use this
-    ;; function to cd to /some/dir, the prompt stays at "~ $". We can
-    ;; force an update (on a new line) by sending an empty line input
-    ;; to the shell. Make sure we clear any input that might already
-    ;; by in eshell buffer so we don't execute unexpected commands.
-    (eshell-kill-input)
-    (eshell-send-input)))
-
-(use-package dired
-  :bind (:map dired-mode-map
-              ("E" . my/dired-open-in-eshell)))
 #+end_src
 *** Expand outline when diffing
 Useful for diffing org mode
@@ -929,9 +910,50 @@ Don't have a good method for finding an entry yet. /Could/
    ((eq format 'md) "")
    (t (apply orig-format keyword desc format nil))))
 
+(defun my/org-ref-notes-function-one-file (key)
+  "Function to open note belonging to KEY.
+ Set `org-ref-notes-function' to this function if you use one
+long file with headlines for each entry."
+  ;; save key to clipboard to make saving pdf later easier by pasting.
+  (with-temp-buffer
+    (insert key)
+    (kill-ring-save (point-min) (point-max)))
+  (let* ((bibtex-entry (org-ref-get-bibtex-entry key))
+         (entry (with-temp-buffer
+		 (insert bibtex-entry)
+		 (bibtex-mode)
+		 (bibtex-beginning-of-entry)
+		 (bibtex-parse-entry)) ))
+
+    (save-restriction
+      (widen)
+      (goto-char (point-min))
+      (let* ((headlines (org-element-map
+			    (org-ref-parse-buffer)
+			    'headline 'identity))
+	     (keys (mapcar
+		    (lambda (hl) (org-element-property :CUSTOM_ID hl))
+		    headlines)))
+	(if (-contains? keys key)
+	    ;; we have it so we go to it.
+	    (progn
+	      (org-open-link-from-string (format "[[#%s]]" key))
+	      (funcall org-ref-open-notes-function))
+	  ;; no entry found, so add one
+	  (goto-char (point-max))
+	  (insert (org-ref-reftex-format-citation
+		   entry (concat "\n" org-ref-note-title-format)))
+	  (mapc (lambda (x)
+		  (save-restriction
+		    (save-excursion
+		      (funcall x))))
+		org-ref-create-notes-hook)
+	  (save-buffer))))))
+
 (use-package org-ref
   :ensure t
   :config
+  (setq org-ref-notes-function 'my/org-ref-notes-function-one-file)
   (advice-add #'org-ref-bibliography-format
               :around #'my/org-ref-bibliography-format)
   (require 'org-ref-citeproc)
@@ -1226,7 +1248,7 @@ Learned about using pdf-tools from [[https://www.youtube.com/watch?v=LFO2UbzbZhA
   ;; system package dependencies
   (pdf-tools-install t t))
 
-;; Setup pdfview:: link scheme in org mode
+;; Setup pdf:: link scheme in org mode
 (use-package org-pdftools :ensure t
   :hook (org-load . org-pdftools-setup-link))
 #+end_src
@@ -1290,6 +1312,41 @@ described [[https://stackoverflow.com/a/6912415][here]]): =((c++-mode . ((mode .
 #+begin_src emacs-lisp
 (add-hook 'c-mode-common-hook #'comment-auto-fill)
 #+end_src
+* Rust Mode
+#+begin_src emacs-lisp
+(use-package rust-mode :ensure t)
+#+end_src
+* Dired mode
+*** =dired-x=
+#+begin_src emacs-lisp
+(use-package dired-x
+  :bind ("C-x C-j" . dired-jump))
+#+end_src
+
+*** Jump to dired buffer in eshell
+#+begin_src emacs-lisp
+(defun my/dired-open-in-eshell ()
+  (interactive)
+  (let ((cwd default-directory))
+    (call-interactively #'eshell)
+    (eshell/cd cwd)
+    ;; if eshell buffer is already open, then the prompt doesn't seem
+    ;; to be updating. E.g. if eshell was at "~ $" and we use this
+    ;; function to cd to /some/dir, the prompt stays at "~ $". We can
+    ;; force an update (on a new line) by sending an empty line input
+    ;; to the shell. Make sure we clear any input that might already
+    ;; by in eshell buffer so we don't execute unexpected commands.
+    (eshell-kill-input)
+    (eshell-send-input)))
+
+(use-package dired
+  :bind (:map dired-mode-map
+              ("E" . my/dired-open-in-eshell))
+  :config
+  ;; Get human-readable sizes in dired
+  (setq dired-listing-switches "-alh"))
+#+end_src
+
 * Haskell Mode
 #+begin_src emacs-lisp
 (use-package haskell-mode
@@ -1320,6 +1377,12 @@ After installing the [[* Dependencies][dependencies]], we can use =Elpy=
   :ensure t
   :config
   (elpy-enable))
+#+end_src
+
+* Kotlin Mode
+#+begin_src emacs-lisp
+(use-package kotlin-mode :ensure t)
+(use-package gradle-mode :ensure t)
 #+end_src
 
 * Misc Modes
