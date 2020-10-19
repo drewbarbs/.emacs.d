@@ -1385,6 +1385,28 @@ After installing the [[* Dependencies][dependencies]], we can use =Elpy=
 (use-package gradle-mode :ensure t)
 #+end_src
 
+* Web mode
+#+begin_src emacs-lisp
+(use-package web-mode
+  :ensure t
+  :mode (("\\.jsx\\'" . web-mode)
+         ("\\.tsx\\'" . web-mode)))
+(use-package typescript-mode :ensure t)
+
+(defun my/setup-tide-mode ()
+  (tide-setup)
+  (add-hook 'before-save-hook #'tide-format-before-save nil t))
+
+(defun my/setup-tide-jsx-or-tsx ()
+  (if (string-match-p "^jsx\\'\\|^tsx\\'" (file-name-extension buffer-file-name))
+      (my/setup-tide-mode)))
+
+(use-package tide
+  :ensure t
+  :after (typescript-mode company flycheck web-mode)
+  :hook ((typescript-mode . my/setup-tide-mode)
+         (web-mode . my/setup-tide-jsx-or-tsx)))
+#+end_src
 * Misc Modes
 ** Markdown
 #+srcname: name
