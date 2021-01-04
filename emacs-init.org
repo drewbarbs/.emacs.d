@@ -44,6 +44,15 @@ sudo pacman -S python-rope python-jedi flake8 autopep8 yapf
 (add-to-list 'load-path (expand-file-name "misc" init-dir))
 #+end_src
 
+#+begin_src emacs-lisp
+(use-package exec-path-from-shell
+  :ensure t
+  :demand
+  :config
+  (when (daemonp)
+    (exec-path-from-shell-initialize)))
+#+end_src
+
 ** Package archives
 I configure the list of package archives to pull from in [[file:init.el][=init.el=]],
 because Emacs 25 insisted on sticking a =(package-initialize)= call in
