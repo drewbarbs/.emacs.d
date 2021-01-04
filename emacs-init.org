@@ -351,7 +351,8 @@ Referenced [[https://www.mortens.dev/blog/emacs-and-the-language-server-protocol
 
 (use-package lsp-mode
   :ensure t
-  :hook ((c++-mode . lsp)
+  :hook ((rust-mode . lsp)
+         (c++-mode . lsp)
          (lsp-mode . (lambda ()
                        (let ((lsp-keymap-prefix "C-c l"))
                          (lsp-enable-which-key-integration)))))
@@ -360,7 +361,8 @@ Referenced [[https://www.mortens.dev/blog/emacs-and-the-language-server-protocol
   (setq lsp-keymap-prefix "C-c l") ; the default "s-l" is taken by my WM
   (setq lsp-prefer-flymake nil)
   (setq lsp-clients-clangd-args '("-j=4" "-background-index" "-log=error"))
-  (add-hook 'lsp-ui-mode-hook  #'my/turn-off-annoying-lsp-ui t))
+  (add-hook 'lsp-ui-mode-hook  #'my/turn-off-annoying-lsp-ui t)
+  (add-hook 'lsp-managed-mode-hook (lambda () (setq-local company-backends '(company-capf)))))
 
 (defun my/turn-off-annoying-lsp-ui ()
   (lsp-ui-doc-mode -1)
@@ -371,15 +373,6 @@ Referenced [[https://www.mortens.dev/blog/emacs-and-the-language-server-protocol
   :requires lsp-mode flycheck
   :config
   (setq lsp-ui-flycheck-enable t))
-
-(use-package company-lsp
-  :ensure t
-  :requires company
-  :config
-  (push 'company-lsp company-backends)
-
-  (setq company-lsp-async t
-        company-lsp-cache-candidates nil))
 #+end_src
 *** Compile keybind
 From https://emacs.stackexchange.com/a/10950
@@ -1314,7 +1307,9 @@ described [[https://stackoverflow.com/a/6912415][here]]): =((c++-mode . ((mode .
 #+end_src
 * Rust Mode
 #+begin_src emacs-lisp
-(use-package rust-mode :ensure t)
+(use-package rust-mode
+  :ensure t
+  :hook (rust-mode . rust-enable-format-on-save))
 #+end_src
 * Dired mode
 *** =dired-x=
