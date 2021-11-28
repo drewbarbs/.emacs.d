@@ -370,8 +370,8 @@ Referenced [[https://www.mortens.dev/blog/emacs-and-the-language-server-protocol
   (setq lsp-keymap-prefix "C-c l") ; the default "s-l" is taken by my WM
   (setq lsp-prefer-flymake nil)
   (setq lsp-clients-clangd-args '("-j=4" "-background-index" "-log=error"))
-  (add-hook 'lsp-ui-mode-hook  #'my/turn-off-annoying-lsp-ui t)
-  (add-hook 'lsp-managed-mode-hook (lambda () (setq-local company-backends '(company-capf)))))
+  (setq lsp-completion-provider :capf)
+  (add-hook 'lsp-ui-mode-hook  #'my/turn-off-annoying-lsp-ui t))
 
 (defun my/turn-off-annoying-lsp-ui ()
   (lsp-ui-doc-mode -1)
@@ -379,7 +379,7 @@ Referenced [[https://www.mortens.dev/blog/emacs-and-the-language-server-protocol
 
 (use-package lsp-ui
   :ensure t
-  :requires lsp-mode flycheck
+  :requires (lsp-mode flycheck)
   :config
   (setq lsp-ui-flycheck-enable t))
 #+end_src
@@ -1252,7 +1252,8 @@ Learned about using pdf-tools from [[https://www.youtube.com/watch?v=LFO2UbzbZhA
 
 ;; Setup pdf:: link scheme in org mode
 (use-package org-pdftools :ensure t
-  :hook (org-load . org-pdftools-setup-link))
+  :init
+  (org-pdftools-setup-link))
 #+end_src
 
 * C/C++ Modes
@@ -1283,6 +1284,20 @@ detected, and we have a =clang-format= executable.
   (add-hook 'c-mode-hook #'my/maybe-set-clang-indent-region)
   (add-hook 'c++-mode-hook #'my/maybe-set-clang-indent-region nil t))
 #+end_src
+*** =gtags=
+
+#+begin_src emacs-lisp
+(use-package gtags
+  :load-path ("/usr/share/global"
+              "/usr/share/gtags"
+              "/usr/local/share/global"
+              "/usr/local/share/gtags")
+  :diminish gtags-mode)
+(use-package ggtags
+  :ensure t
+  :diminish ggtags-mode)
+#+end_src
+
 *** Use =electric-pair-mode=
 This is great for auto-inserting closing parentheses, doing the right
 thing when I press "Enter" on the opening brace of a function
@@ -1402,8 +1417,10 @@ After installing the [[* Dependencies][dependencies]], we can use =Elpy=
   (add-hook 'before-save-hook #'tide-format-before-save nil t))
 
 (defun my/setup-tide-jsx-or-tsx ()
-  (if (string-match-p "^jsx\\'\\|^tsx\\'" (file-name-extension buffer-file-name))
-      (my/setup-tide-mode)))
+  (when (string-match-p "^jsx\\'\\|^tsx\\'"
+                        (file-name-extension buffer-file-name))
+    (my/setup-tide-mode)
+    (setq-local web-mode-enable-auto-quoting nil)))
 
 (use-package tide
   :ensure t
