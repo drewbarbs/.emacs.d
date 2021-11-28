@@ -439,6 +439,11 @@ Set font size to 13 point (height value is in 1/10 pt)
                ((my/have-font "Sans Serif") '(:family "Sans Serif")))))
     ;; set the variable-pitch face to use font we found
     (eval `(set-face-attribute 'variable-pitch nil ,@ft)))
+  ;; https://www.reddit.com/r/emacs/comments/ggd90c/color_emoji_in_emacs_27/
+  ;; Emoji: 😄, 🤦, 🏴󠁧󠁢󠁳󠁣󠁴󠁿
+  (set-fontset-font t 'symbol "Noto Color Emoji" nil 'append)
+  (set-fontset-font t 'symbol "Segoe UI Emoji" nil 'append)
+  (set-fontset-font t 'symbol "Symbola" nil 'append)
   (when (my/have-font "Source Code Pro")
     (set-face-attribute 'default nil :font "Source Code Pro" :height 130)))
 
@@ -1260,6 +1265,12 @@ Learned about using pdf-tools from [[https://www.youtube.com/watch?v=LFO2UbzbZhA
   :after pdf-tools
   :config
   (org-pdftools-setup-link))
+#+end_src
+
+** Org Babel Rust
+
+#+begin_src emacs-lisp
+(use-package ob-rust :ensure t)
 #+end_src
 
 * C/C++ Modes
