@@ -1252,19 +1252,94 @@ holding contextual information."
 ** PDF Tools
 Learned about using pdf-tools from [[https://www.youtube.com/watch?v=LFO2UbzbZhA][this]] YT video.
 #+begin_src emacs-lisp
+(defun my/set-pdf-view-mode-line ()
+  (setq-local mode-line-format
+              '("%e"
+                (:eval
+                 (let* ((active (powerline-selected-window-active))
+                        (mode-line-buffer-id (if active 'mode-line-buffer-id 'mode-line-buffer-id-inactive))
+                        (mode-line (if active 'mode-line 'mode-line-inactive))
+                        (face0 (if active 'powerline-active0 'powerline-inactive0))
+                        (face1 (if active 'powerline-active1 'powerline-inactive1))
+                        (face2 (if active 'powerline-active2 'powerline-inactive2))
+                        (separator-left (intern (format "powerline-%s-%s"
+                                                        (powerline-current-separator)
+                                                        (car powerline-default-separator-dir))))
+                        (separator-right (intern (format "powerline-%s-%s"
+                                                         (powerline-current-separator)
+                                                         (cdr powerline-default-separator-dir))))
+                        (lhs (list (powerline-buffer-id `(mode-line-buffer-id ,face0) 'l)
+                                   (powerline-raw " " face0)
+                                   (funcall separator-left face0 face1)
+                                   (powerline-raw " " face1)
+                                   (powerline-raw
+                                    (format "Page %d of %d" (pdf-view-current-page) (pdf-cache-number-of-pages))
+                                    face1)
+                                   (powerline-raw " " face1)
+                                   (funcall separator-left face1 face2)))
+                        (rhs (list)))
+                   (concat (powerline-render lhs)
+                           (powerline-fill face2 (powerline-width rhs))
+                           (powerline-render rhs)))))))
+
+
 (use-package pdf-tools
   :ensure t
-  :mode "\\.pdf\\'"
+  :mode ("\\.pdf\\'" . pdf-view-mode)
+  :magic ("%PDF" . pdf-view-mode)
+  :hook (pdf-view-mode . my/set-pdf-view-mode-line)
   :config
   ;; attempt to install without prompting, but don't try to install
   ;; system package dependencies
   (pdf-tools-install t t))
 
+(defun relativize-pdf-link (link)
+  (let ((case-fold-search nil))
+    (when (string-match "\\`pdf:" link)
+      (let* ((type (match-string-no-properties 0 link))
+	     (path-start (match-end 0))
+	     (search (and (string-match "::\\(.*\\)\\'" link)
+			  (match-string 1 link)))
+	     (path
+	      (if search
+		  (substring-no-properties
+		   link path-start (match-beginning 0))
+		(substring-no-properties link (match-end 0))))
+	     (origpath path))
+	(cond
+	 ((eq org-link-file-path-type 'absolute)
+	  (setq path (abbreviate-file-name (expand-file-name path))))
+	 ((eq org-link-file-path-type 'noabbrev)
+	  (setq path (expand-file-name path)))
+	 ((eq org-link-file-path-type 'relative)
+	  (setq path (file-relative-name path)))
+	 ((functionp org-link-file-path-type)
+	  (setq path (funcall org-link-file-path-type
+			      (expand-file-name path))))
+	 (t
+	  (save-match-data
+	    (if (string-match (concat "^" (regexp-quote
+					   (expand-file-name
+					    (file-name-as-directory
+					     default-directory))))
+			      (expand-file-name path))
+		;; We are linking a file with relative path name.
+		(setq path (substring (expand-file-name path)
+				      (match-end 0)))
+	      (setq path (abbreviate-file-name (expand-file-name path)))))))
+	(setq link (concat type path (and search (concat "::" search)))))))
+  link)
+
 ;; Setup pdf:: link scheme in org mode
 (use-package org-pdftools :ensure t
-  :after pdf-tools
   :config
-  (org-pdftools-setup-link))
+  (org-pdftools-setup-link)
+
+  (define-advice org-link-make-string
+      (:around (orig-fun link &optional description)
+               relativize-pdf-path)
+    (let ((link (relativize-pdf-link link)))
+      (apply orig-fun (list link description)))))
 #+end_src
 
 ** Org Babel Rust
