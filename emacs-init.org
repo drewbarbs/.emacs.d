@@ -864,6 +864,12 @@ Flyspell config, appropriate from Prelude.
     (set-process-query-on-exit-flag (get-process "devhelp") nil)))
 (global-set-key [f7] #'my/devhelp-word-at-point)
 #+end_src
+** =deadgrep=
+A client for ripgrep
+#+begin_src emacs-lisp
+(use-package deadgrep :ensure t)
+#+end_src
+
 * Eshell
 #+begin_src emacs-lisp
 (add-hook 'eshell-mode-hook
