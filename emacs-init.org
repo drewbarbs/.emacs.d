@@ -1509,6 +1509,9 @@ After installing the [[* Dependencies][dependencies]], we can use =Elpy=
 #+begin_src emacs-lisp
 (use-package elpy
   :ensure t
+  :defer 2
+  :config
+  (elpy-enable)
   :hook (python-mode . elpy-mode))
 #+end_src
 
