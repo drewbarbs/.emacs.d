@@ -1523,29 +1523,26 @@ After installing the [[* Dependencies][dependencies]], we can use =Elpy=
 
 * Web mode
 #+begin_src emacs-lisp
+(defun my/setup-jsx-or-tsx ()
+  (setq-local web-mode-enable-auto-quoting nil)
+  (lsp)
+  (add-hook 'before-save-hook #'lsp-format-buffer nil t))
+
 (use-package web-mode
   :ensure t
   :mode (("\\.jsx\\'" . web-mode)
-         ("\\.tsx\\'" . web-mode)))
+         ("\\.tsx\\'" . web-mode))
+  :init
+  (add-hook 'web-mode-hook #'my/setup-jsx-or-tsx))
+
+(defun my/setup-ts-mode()
+  (lsp)
+  (add-hook 'before-save-hook #'lsp-format-buffer nil t))
+
 (use-package typescript-mode
   :ensure t
-  :mode "\\.tsx?\\'")
-
-(defun my/setup-tide-mode ()
-  (tide-setup)
-  (add-hook 'before-save-hook #'tide-format-before-save nil t))
-
-(defun my/setup-tide-jsx-or-tsx ()
-  (when (string-match-p "^jsx\\'\\|^tsx\\'"
-                        (file-name-extension buffer-file-name))
-    (my/setup-tide-mode)
-    (setq-local web-mode-enable-auto-quoting nil)))
-
-(use-package tide
-  :ensure t
-  :after (typescript-mode company flycheck web-mode)
-  :hook ((typescript-mode . my/setup-tide-mode)
-         (web-mode . my/setup-tide-jsx-or-tsx)))
+  :mode "\\.ts\\'"
+  :hook (typescript-mode . #'my/setup-ts-mode))
 #+end_src
 * Misc Modes
 ** Markdown
