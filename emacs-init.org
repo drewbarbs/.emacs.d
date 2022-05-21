@@ -1421,12 +1421,29 @@ described [[https://stackoverflow.com/a/6912415][here]]): =((c++-mode . ((mode .
 (add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
 #+end_src
 
-
 *** Disable =auto-fill-mode= except for comments
 
 #+begin_src emacs-lisp
 (add-hook 'c-mode-common-hook #'comment-auto-fill)
 #+end_src
+*** Open Makefiles in Makefile mode
+#+begin_src emacs-lisp
+(setq auto-mode-alist
+      (append auto-mode-alist
+              '(("[Mm]akefile\\..+" . makefile-gmake-mode)
+                ("Kbuild\\(\\..+\\)?" . makefile-gmake-mode))))
+#+end_src
+* Kernel Spelunking
+#+begin_src emacs-lisp
+(use-package xcscope)
+(use-package git-link
+  :bind (("C-c g l" . git-link))
+  :config
+  (define-advice git-link-github (:around (orig-fun hostname dirname filename branch commit start end) "git-link-force-commit")
+    (apply orig-fun hostname dirname filename nil commit start end nil)))
+#+end_src
+
+
 * Rust Mode
 #+begin_src emacs-lisp
 (use-package rust-mode
