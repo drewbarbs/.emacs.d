@@ -395,6 +395,18 @@ From https://emacs.stackexchange.com/a/10950
 (put 'downcase-region 'disabled nil)
 #+end_src
 
+*** Edit code comments in dedicated buffer
+The following makes it easy to add doc, e.g. to rust functions
+
+#+begin_src emacs-lisp
+(use-package separedit
+  :ensure t
+  :config
+  (progn
+    (define-key prog-mode-map (kbd "C-c '") #'separedit)
+    (setq separedit-default-mode 'markdown-mode)))
+#+end_src
+
 ** Appearance
 *** Theme
 Using leuven, along with powerline
