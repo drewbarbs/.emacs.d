@@ -1497,6 +1497,15 @@ described [[https://stackoverflow.com/a/6912415][here]]): =((c++-mode . ((mode .
   (setq dired-listing-switches "-alh"))
 #+end_src
 
+
+*** DWIM
+Have dired suggest the next dired window's directory as the
+destination for file copy/move operations
+
+#+begin_src text
+(setq dired-dwim-target t)
+#+end_src
+
 * Haskell Mode
 #+begin_src emacs-lisp
 (use-package haskell-mode
