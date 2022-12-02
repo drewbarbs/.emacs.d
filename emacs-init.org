@@ -243,14 +243,13 @@ disable auto-fill except for on comments. Taken from [[https://www.emacswiki.org
   :diminish company-mode)
 #+end_src
 
-**** =company-quickhelp=
+**** =company-box=
 Show a documentation popup for company completion candidates
 
 #+begin_src emacs-lisp
-(use-package company-quickhelp
+(use-package company-box
   :ensure t
-  :config
-  (company-quickhelp-mode 1))
+  :hook (company-mode . company-box-mode))
 #+end_src
 
 **** =hippie-expand=
