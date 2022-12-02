@@ -1459,6 +1459,11 @@ described [[https://stackoverflow.com/a/6912415][here]]): =((c++-mode . ((mode .
 #+begin_src emacs-lisp
 (use-package rust-mode
   :ensure t
+  :custom
+  (rust-format-show-buffer nil "Disable popping up a new window with rustfmt errors")
+  ;; rust-analyzer is in the standard tool collection as of 1.64
+  ;; https://blog.rust-lang.org/2022/09/22/Rust-1.64.0.html#rust-analyzer-is-now-available-via-rustup
+  ;; (lsp-rust-analyzer-server-command '("rustup", "run", "stable", "rust-analyzer") "Use rust-analzyer from rustup")
   :hook (rust-mode . rust-enable-format-on-save))
 #+end_src
 * Dired mode
