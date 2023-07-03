@@ -1,6 +1,3 @@
-[submodule "snippets"]
-	path = snippets
-	url = https://github.com/drewbarbs/yasnippet-snippets.git
 [submodule "other-snippets/org-mode"]
 	path = other-snippets/org-mode
 	url = https://github.com/drewbarbs/yasnippet-org-mode.git
