@@ -380,6 +380,15 @@ Referenced [[https://www.mortens.dev/blog/emacs-and-the-language-server-protocol
   :requires (lsp-mode flycheck)
   :config
   (setq lsp-ui-flycheck-enable t))
+
+(use-package lsp-java
+  :ensure t
+  :hook ((java-mode . lsp)))
+
+(use-package dap-mode
+  :ensure t
+  :after lsp-mode
+  :config (dap-auto-configure-mode))
 #+end_src
 *** Compile keybind
 From https://emacs.stackexchange.com/a/10950
