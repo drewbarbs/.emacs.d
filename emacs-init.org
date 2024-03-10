@@ -7,10 +7,7 @@ My emacs configuration inspired by [[http://endlessparentheses.com/init-org-With
 * Dependencies
 The packages configured by this file require the following to be used
 to their fullest extent:
-- Emacs >= 24.5 (for magit)
-- Git >= 1.9.4 (for magit)
 - =clang-format=
-- Python + IPython >= 5 + Jupyter >= 1.0 for [[https://github.com/gregsexton/ob-ipython][ob-ipython]]
 - Rust: install rust-analyzer using the instructions [[https://rust-analyzer.github.io/manual.html#emacs][here]]
 - =elpy= dependencies:
   - =rope=
@@ -249,6 +246,7 @@ Show a documentation popup for company completion candidates
 #+begin_src emacs-lisp
 (use-package company-box
   :ensure t
+  :diminish company-box-mode
   :hook (company-mode . company-box-mode))
 #+end_src
 
@@ -366,6 +364,7 @@ Referenced [[https://www.mortens.dev/blog/emacs-and-the-language-server-protocol
                          (lsp-enable-which-key-integration)))))
   :config
   (define-key lsp-mode-map (kbd "C-c l") lsp-command-map)
+  (diminish 'lsp-lens-mode)
   (setq lsp-keymap-prefix "C-c l") ; the default "s-l" is taken by my WM
   (setq lsp-prefer-flymake nil)
   (setq lsp-clients-clangd-args '("-j=4" "-background-index" "-log=error"))
@@ -648,10 +647,9 @@ To "helm" a command, use the =helm-command-prefix-key=: =C-x c=. E.g.
 =C-x c M-x= runs =helm-M-x=.
 
 #+begin_src emacs-lisp
-(use-package helm-config :ensure helm)
 (use-package helm
-  :after helm-config
   :diminish helm-mode
+  :ensure t
   :bind (("M-x" . helm-M-x)
          ("M-s o" . helm-occur)
          ("C-h a" . helm-apropos)
@@ -691,7 +689,7 @@ the other window.
 *** Jump to char with =avy=
 Use =avy=, based on =ace-jump-mode= and =vim-easymotion=.
 
-- Jump to a character using =C-:=
+- Jump to a character using =M-g c=
 - Jump to a character (after entering two characters) using =C=' (does
   not work in org mode, because this is instead bound to org-cycle-agenda-files
 - Jump to a line with =M-g f=
@@ -701,7 +699,7 @@ Use =avy=, based on =ace-jump-mode= and =vim-easymotion=.
 #+begin_src emacs-lisp
 (use-package avy
   :ensure t
-  :bind (("C-:" . avy-goto-char)
+  :bind (("M-g c" . avy-goto-char)
          ("C-'" . avy-goto-char-2)
          ("M-g '" . avy-goto-char-2)
          ("M-g l" . avy-goto-line)
@@ -1451,11 +1449,11 @@ described [[https://stackoverflow.com/a/6912415][here]]): =((c++-mode . ((mode .
 (use-package xcscope)
 (use-package git-link
   :bind (("C-c g l" . git-link))
+  :ensure t
   :config
   (define-advice git-link-github (:around (orig-fun hostname dirname filename branch commit start end) "git-link-force-commit")
     (apply orig-fun hostname dirname filename nil commit start end nil)))
 #+end_src
-
 
 * Rust Mode
 #+begin_src emacs-lisp
@@ -1504,7 +1502,7 @@ described [[https://stackoverflow.com/a/6912415][here]]): =((c++-mode . ((mode .
 Have dired suggest the next dired window's directory as the
 destination for file copy/move operations
 
-#+begin_src text
+#+begin_src emacs-lisp
 (setq dired-dwim-target t)
 #+end_src
 
