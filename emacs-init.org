@@ -415,11 +415,33 @@ Using leuven, along with powerline
 
 (use-package leuven-theme
   :ensure t
-  :pin melpa
-  :config (load-theme 'leuven :no-confirm))
+  :pin melpa)
+
+(defun my/do-powerline-reset (&rest ignore)
+  (powerline-reset))
+
+(defun my/pre-theme-switch (&rest ignore)
+  (disable-theme 'leuven)
+  (disable-theme 'monokai))
+
+(use-package darkman
+  :ensure t
+  :custom
+  (darkman-themes '(:light leuven :dark monokai) "Set themes to use during day/night")
+  :config
+  (advice-add 'darkman--load-theme :before #'my/pre-theme-switch)
+  (advice-add 'darkman--load-theme :after #'my/do-powerline-reset)
+  (darkman-mode +1))
+
+(defun nighttime ()
+  (interactive)
+  (disable-theme 'leuven)
+  (load-theme 'monokai)
+  (powerline-reset))
 
 (use-package powerline
   :ensure t
+  :after (darkman)
   :config
   (powerline-default-theme))
 #+end_src
@@ -499,14 +521,6 @@ another window
   :config (beacon-mode +1))
 #+end_src
 
-*** "Night mode"
-#+begin_src emacs-lisp
-(defun nighttime ()
-  (interactive)
-  (disable-theme 'leuven)
-  (load-theme 'monokai)
-  (powerline-reset))
-#+end_src
 ** Behavior
 *** Ask for confirmation before quitting
 #+begin_src emacs-lisp
